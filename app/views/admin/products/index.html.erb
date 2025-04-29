@@ -1,0 +1,27 @@
+<h1 class="mb-4">Manage Products</h1>
+
+<%= link_to "New Product", new_admin_product_path, class: "btn btn-primary mb-3" %>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @products.each do |product| %>
+        <tr>
+          <td><%= product.name %></td>
+          <td>$<%= product.price %></td>
+          <td>
+            <%= link_to "Edit", edit_admin_product_path(product), class: "btn btn-warning btn-sm" %>
+            <%= link_to "Delete", admin_product_path(product), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger btn-sm" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -68,6 +68,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "tailwindcss-ruby", "~> 4.1"
-
-gem "tailwindcss-rails", "~> 4.2"
+gem 'bootstrap', '~> 5.3.0'
+gem 'jquery-rails', '~> 4.4.0'
+gem 'jquery-ui-rails', '~> 6.0.1'
+gem 'sassc-rails'
