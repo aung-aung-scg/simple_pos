@@ -1,0 +1,42 @@
+<%= form_with(model: [:admin, @User], local: true, html: { class: "needs-validation", enctype: "multipart/form-data" }) do |form| %>
+  <div class="container mt-4">
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label"><%= form.label :name %></label>
+      <div class="col-sm-10">
+        <%= form.text_field :name, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label"><%= form.label :price %></label>
+      <div class="col-sm-10">
+        <%= form.number_field :price, step: 0.01, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label"><%= form.label :stock %></label>
+      <div class="col-sm-10">
+        <%= form.number_field :stock, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label"><%= form.label :description %></label>
+      <div class="col-sm-10">
+        <%= form.text_area :description, rows: 4, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label"><%= form.label :image %></label>
+      <div class="col-sm-10">
+        <%= form.file_field :image, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="text-end">
+      <%= form.submit "Save", class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>

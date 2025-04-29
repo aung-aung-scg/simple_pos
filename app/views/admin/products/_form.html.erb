@@ -1,0 +1,113 @@
+<%= form_with(model: [:admin, @product], local: true, html: { class: "needs-validation", novalidate: true, enctype: "multipart/form-data" }) do |form| %>
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">
+        <i class="fas <%= @product.new_record? ? 'fa-plus-circle' : 'fa-edit' %> me-2"></i>
+        <%= @product.new_record? ? 'Add New Product' : 'Edit Product' %>
+      </h5>
+    </div>
+    <div class="card-body">
+      <!-- Name Field -->
+      <div class="mb-3 row">
+        <%= form.label :name, "Product Name", class: "col-sm-3 col-form-label fw-bold" %>
+        <div class="col-sm-9">
+          <%= form.text_field :name, class: 'form-control', required: true %>
+          <div class="invalid-feedback">
+            Please provide a product name.
+          </div>
+        </div>
+      </div>
+
+      <!-- Price Field -->
+      <div class="mb-3 row">
+        <%= form.label :price, class: "col-sm-3 col-form-label fw-bold" %>
+        <div class="col-sm-9">
+          <div class="input-group">
+            <span class="input-group-text">MMK</span>
+            <%= form.number_field :price, step: 0.01, class: 'form-control', required: true %>
+            <div class="invalid-feedback">
+              Please provide a valid price.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stock Field -->
+      <div class="mb-3 row">
+        <%= form.label :stock, class: "col-sm-3 col-form-label fw-bold" %>
+        <div class="col-sm-9">
+          <%= form.number_field :stock, class: 'form-control', required: true %>
+          <div class="invalid-feedback">
+            Please provide stock quantity.
+          </div>
+        </div>
+      </div>
+
+      <!-- Description Field -->
+      <div class="mb-3 row">
+        <%= form.label :description, class: "col-sm-3 col-form-label fw-bold" %>
+        <div class="col-sm-9">
+          <%= form.text_area :description, rows: 4, class: 'form-control' %>
+          <small class="text-muted">Optional product description</small>
+        </div>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="mb-3 row">
+        <%= form.label :image, "Product Image", class: "col-sm-3 col-form-label fw-bold" %>
+        <div class="col-sm-9">
+          <%= form.file_field :image, class: 'form-control', accept: 'image/*' %>
+          
+          <% if @product.image.attached? %>
+            <div class="mt-3">
+              <p class="mb-1">Current Image:</p>
+              <%= image_tag @product.image.variant(resize_to_limit: [150, 150]), class: "img-thumbnail" %>
+              <div class="form-check mt-2">
+                <%= form.check_box :remove_image, class: 'form-check-input' %>
+                <%= form.label :remove_image, "Remove current image", class: 'form-check-label' %>
+              </div>
+            </div>
+          <% else %>
+            <small class="text-muted">JPEG, PNG or GIF (Max 2MB)</small>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between">
+        <%= link_to "Cancel", admin_products_path, class: "btn btn-secondary" %>
+        <div>
+          <%= form.submit @product.new_record? ? 'Create Product' : 'Update Product', 
+                         class: 'btn btn-primary px-4',
+                         data: { disable_with: @product.new_record? ? 'Creating...' : 'Updating...' } %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<!-- Client-side Validation Script -->
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>

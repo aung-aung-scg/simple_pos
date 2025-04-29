@@ -1,1 +1,71 @@
 @import "bootstrap";
+@import "admin";
+@import "font-awesome";
+
+.btn {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    color: white;
+    margin-right: 0.3rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-details {
+    background-color: #4F46E5; /* Indigo */
+  }
+  
+  .btn-details:hover {
+    background-color: #4338CA;
+  }
+  
+  .btn-edit {
+    background-color: #059669; /* Emerald */
+  }
+  
+  .btn-edit:hover {
+    background-color: #047857;
+  }
+  
+  .btn-delete {
+    background-color: #DC2626; /* Red */
+  }
+  
+  .btn-delete:hover {
+    background-color: #B91C1C;
+  }
+  
+  .sidebar {
+    background-color: #0b59a6; 
+    border-right: 2px solid #ddd;
+    box-shadow: 3px 0px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .content {
+    background-color: #ffffff;  // Different background color for the content area
+    padding: 20px;  // Padding for content
+  }
+  
+  .sidebar .nav-link {
+    color: #333;  // Dark text for better readability
+  }
+  
+  .sidebar .nav-link:hover {
+    background-color: #007bff;  // Highlight the link with a color when hovering
+    color: white;  // Change text color on hover
+  }
+
+  /* Sidebar styling */
+  .col-md-3 {
+    background-color: #f8f9fa;  // Lighter color for the sidebar
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);  // Add subtle shadow
+  }
+
+  /* Main content styling */
+  .col-md-9 {
+    background-color: #ffffff;  // White background for the content area
+    padding: 10px;  // Extra padding for content spacing
+  }
+

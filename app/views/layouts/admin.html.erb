@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Simple POS</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload" %>
+  </head>
+
+  <body class="bg-light">
+    <!-- Admin Header -->
+    <%= render 'layouts/admin_header' %>
+
+    <div class="container-fluid d-flex p-0">
+      <!-- Sidebar -->
+      <div class="col-md-2 bg-light min-vh-100 p-3 border-right">
+        <%= render 'layouts/admin_sidebar' %>  <!-- Sidebar links for admin -->
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9 p-4">
+        <%= yield %>  <!-- Main content for the admin pages -->
+      </div>
+    </div>
+
+    <!-- Admin Footer -->
+    <%= render 'layouts/footer' %>
+  </body>
+</html>
