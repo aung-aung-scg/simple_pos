@@ -8,11 +8,20 @@
     <%= csp_meta_tag %>
 
     <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/lightbox2@2/dist/css/lightbox.min.css" %>
   </head>
 
   <body>
+     <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/lightbox2@2/dist/js/lightbox.min.js" %>
     <!-- Header -->
     <%= render 'layouts/header' %>
+
+    <% if notice %>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= notice %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
 
     <main class="container-fluid">
       <%= yield %>  <!-- Main content of the page -->

@@ -20,10 +20,10 @@ Rails.application.routes.draw do
   end
 
   # POS module routes (no path prefix, but controller under POS module)
-  scope module: :pos do
-    post "add_to_cart/:product_id", to: "cart#add", as: :add_to_cart
-    post "checkout", to: "checkout#process", as: :checkout
-  end
+  post "add_to_cart/:product_id", to: "pos#add_to_cart", as: :add_to_cart
+  post "checkout", to: "pos#checkout", as: :checkout
+  get 'cart', to: 'pos#show', as: :pos_cart
+  get "pos", to: "pos#index", as: :pos
 
   # Admin namespace
   namespace :admin do

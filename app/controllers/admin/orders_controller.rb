@@ -4,11 +4,11 @@ class Admin::OrdersController < ApplicationController
   before_action :authenticate_admin!
 
   def index
-    @orders = Order.includes(:user).order(created_at: :desc)
+    @orders = Order.includes(:user, order_items: :product).order(created_at: :desc)
   end
 
   def show
-    @order = Order.find(params[:id])
+    @order = Order.includes(order_items: :product).find(params[:id])
   end
 
   def destroy

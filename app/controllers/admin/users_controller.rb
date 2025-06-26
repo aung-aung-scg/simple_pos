@@ -27,8 +27,12 @@ class Admin::UsersController < ApplicationController
   end
 
   def update
-    if @user.update(user_params)
-      redirect_to admin_user_path(@user), notice: "User updated."
+    permitted_params = user_params
+    if permitted_params[:password].blank? && permitted_params[:password_confirmation].blank?
+      permitted_params = permitted_params.except(:password, :password_confirmation)
+    end
+    if @user.update(permitted_params)
+      redirect_to admin_user_path, notice: "User updated."
     else
       render :edit
     end

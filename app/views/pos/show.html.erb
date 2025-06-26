@@ -1,0 +1,45 @@
+<h1>Your Cart</h1>
+
+<% if @cart.empty? %>
+  <p>Your cart is empty.</p>
+<% else %>
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @products.each do |product| %>
+          <tr>
+            <td><%= product.name %></td>
+            <td><%= @cart[product.id.to_s] %></td>
+            <td>MMK <%= number_with_delimiter(product.price) %></td>
+            <td>MMK <%= number_with_delimiter(product.price * @cart[product.id.to_s]) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="fs-5 fw-semibold">
+    <strong>Total:</strong> MMK <%= number_with_delimiter(@products.sum { |p| p.price * @cart[p.id.to_s] }) %>
+  </p>
+
+  <%= button_to "Place Order", checkout_path, method: :post, class: "btn btn-primary btn-lg" %>
+<% end %>
+
+<style>
+  #cart-icon {
+    position: relative;
+  }
+
+  #cart-icon .badge {
+    font-size: 0.7rem;
+    padding: 0.25em 0.4em;
+  }
+</style>
