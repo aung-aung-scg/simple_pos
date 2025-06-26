@@ -10,3 +10,10 @@
 Product.create(name: "Coffee", price: 3.5)
 Product.create(name: "Tea", price: 2.5)
 Product.create(name: "Sandwich", price: 5.0)
+User.create!(
+  email: "admin@example.com",
+  password: "password",
+  password_confirmation: "password",
+  role: "admin",
+  admin: true
+)

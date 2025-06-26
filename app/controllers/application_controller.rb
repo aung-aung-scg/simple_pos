@@ -1,21 +1,22 @@
 class ApplicationController < ActionController::Base
-  helper_method :current_user, :admin?
-
-  def current_user
-    @current_user ||= User.find_by(id: session[:user_id])
-  end
+  helper_method :admin?
 
   def admin?
     current_user&.admin?
   end
 
-  def authenticate_user!
-    redirect_to login_path, alert: "Please login first" unless current_user
+  def authenticate_admin!
+    unless current_user
+      redirect_to new_user_session_path, alert: "Please login"
+    else
+      unless admin?
+        redirect_to root_path, alert: "Not authorized"
+      end
+    end
   end
 
-  def authenticate_admin!
-    unless admin?
-      redirect_to root_path, alert: "Not authorized"
-    end
+  # Optional: Customize post-login path
+  def after_sign_in_path_for(resource)
+    resource.admin? ? admin_root_path : pos_path
   end
 end

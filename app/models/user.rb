@@ -1,9 +1,16 @@
 class User < ApplicationRecord
-  has_secure_password
+  # Devise modules
+  devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
 
-  enum role: { user: "user", admin: "admin" }
+  # Enum for user roles
+  enum role: { user: 'user', admin: 'admin' }
 
-  def admin?
-    admin == true
+  # Default role for new users
+  after_initialize :set_default_role, if: :new_record?
+
+  private
+
+  def set_default_role
+    self.role ||= :user
   end
 end

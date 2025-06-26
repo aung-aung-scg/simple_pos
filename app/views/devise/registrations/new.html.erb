@@ -1,0 +1,87 @@
+<div class="container py-5" style="background-color: #f8f9fa;">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg rounded-4 border-0">
+        <!-- Card Header -->
+        <div class="card-header bg-gradient-primary text-white py-4 text-center rounded-top-4">
+          <h1 class="h4 mb-0 d-flex justify-content-center align-items-center">
+            <i class="fas fa-user-plus me-2"></i>
+            Sign Up
+          </h1>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body p-5">
+          <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "needs-validation", novalidate: true }) do |f| %>
+            
+            <!-- Email Field -->
+            <div class="mb-4 position-relative">
+              <%= f.label :email, class: "form-label fw-semibold" %>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-envelope text-muted"></i>
+                </span>
+                <%= f.email_field :email, class: "form-control py-3 ps-2 border-start-0 rounded-end", placeholder: "you@example.com", required: true, autofocus: true, autocomplete: "email" %>
+                <div class="invalid-feedback"><%= t('errors.messages.blank') %></div>
+              </div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="mb-4 position-relative">
+              <%= f.label :password, class: "form-label fw-semibold" %>
+              <% if @minimum_password_length %>
+                <small class="text-muted d-block mb-2">(<%= @minimum_password_length %> characters minimum)</small>
+              <% end %>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-lock text-muted"></i>
+                </span>
+                <%= f.password_field :password, class: "form-control py-3 ps-2 border-start-0 rounded-end", placeholder: "Create a password", required: true, autocomplete: "new-password" %>
+                <div class="invalid-feedback"><%= t('errors.messages.blank') %></div>
+              </div>
+            </div>
+
+            <!-- Password Confirmation -->
+            <div class="mb-4 position-relative">
+              <%= f.label :password_confirmation, class: "form-label fw-semibold" %>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-lock text-muted"></i>
+                </span>
+                <%= f.password_field :password_confirmation, class: "form-control py-3 ps-2 border-start-0 rounded-end", placeholder: "Confirm your password", required: true, autocomplete: "new-password" %>
+                <div class="invalid-feedback"><%= t('errors.messages.blank') %></div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid mb-4">
+              <%= f.submit "Sign Up", class: "btn btn-gradient-primary btn-lg fw-semibold py-3" %>
+            </div>
+          <% end %>
+
+          <!-- Login Link -->
+          <div class="d-flex justify-content-center gap-3">
+            <%= link_to "Already have an account? Sign In", new_session_path(resource_name), class: "text-decoration-none fw-semibold" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Optional CSS for gradient button (same as login) -->
+<style>
+  .btn-gradient-primary {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  .btn-gradient-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+  }
+</style>

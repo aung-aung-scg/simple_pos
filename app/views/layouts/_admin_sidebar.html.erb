@@ -1,0 +1,47 @@
+<div class="d-flex flex-column p-3 bg-light sidebar" style="width: 250px; min-height: 100vh;">
+  <h3 class="text-center mb-4">Admin Panel</h3>
+  <ul class="nav flex-column">
+    <!-- Dashboard -->
+    <li class="nav-item">
+      <%= link_to admin_root_path, class: "nav-link d-flex align-items-center" do %>
+        <i class="fa fa-tachometer-alt me-2"></i> <!-- Dashboard icon -->
+        Dashboard
+      <% end %>
+    </li>
+
+    <!-- Products -->
+    <li class="nav-item">
+      <%= link_to admin_products_path, class: "nav-link d-flex align-items-center" do %>
+        <i class="fa fa-cogs me-2"></i> <!-- Products icon -->
+        Products
+      <% end %>
+    </li>
+
+    <!-- Users -->
+    <li class="nav-item">
+      <%= link_to admin_users_path, class: "nav-link d-flex align-items-center" do %>
+        <i class="fa fa-users me-2"></i> <!-- Users icon -->
+        Users
+      <% end %>
+    </li>
+
+    <!-- Orders -->
+    <li class="nav-item">
+      <%= link_to admin_orders_path, class: "nav-link d-flex align-items-center" do %>
+        <i class="fa fa-box me-2"></i> <!-- Orders icon -->
+        Orders
+      <% end %>
+    </li>
+
+    <!-- Logout -->
+    <li class="nav-item">
+      <%= link_to destroy_user_session_path,
+                  method: :delete,
+                  data: { turbo_method: :delete },
+                  class: "nav-link text-danger d-flex align-items-center" do %>
+        <i class="fa fa-sign-out-alt me-2"></i>
+        Logout
+      <% end %>
+    </li>
+  </ul>
+</div>

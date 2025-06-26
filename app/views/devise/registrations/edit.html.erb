@@ -1,0 +1,108 @@
+<div class="container py-5" style="background-color: #f8f9fa;">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg rounded-4 border-0">
+        <!-- Card Header -->
+        <div class="card-header bg-gradient-primary text-white py-4 text-center rounded-top-4">
+          <h1 class="h4 mb-0 d-flex justify-content-center align-items-center">
+            <i class="fas fa-user-cog me-2"></i>
+            Edit Profile
+          </h1>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body p-5">
+          <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "needs-validation", novalidate: true }) do |f| %>
+            <!-- Email Field -->
+            <div class="mb-4 position-relative">
+              <%= f.label :email, class: "form-label fw-semibold" %>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-envelope text-muted"></i>
+                </span>
+                <%= f.email_field :email, class: "form-control py-3 ps-2 border-start-0 rounded-end", required: true, autocomplete: "email" %>
+                <div class="invalid-feedback"><%= t('errors.messages.blank') %></div>
+              </div>
+            </div>
+
+            <!-- Confirmation Message (if applicable) -->
+            <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+              <div class="alert alert-warning small mb-4">
+                Currently waiting confirmation for: <strong><%= resource.unconfirmed_email %></strong>
+              </div>
+            <% end %>
+
+            <!-- Password Field -->
+            <div class="mb-4 position-relative">
+              <%= f.label :password, class: "form-label fw-semibold" %>
+              <small class="text-muted d-block mb-2">(leave blank if you don't want to change it)</small>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-lock text-muted"></i>
+                </span>
+                <%= f.password_field :password, class: "form-control py-3 ps-2 border-start-0 rounded-end", autocomplete: "new-password" %>
+              </div>
+              <% if @minimum_password_length %>
+                <small class="text-muted d-block mt-1"><%= @minimum_password_length %> characters minimum</small>
+              <% end %>
+            </div>
+
+            <!-- Password Confirmation -->
+            <div class="mb-4 position-relative">
+              <%= f.label :password_confirmation, class: "form-label fw-semibold" %>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-lock text-muted"></i>
+                </span>
+                <%= f.password_field :password_confirmation, class: "form-control py-3 ps-2 border-start-0 rounded-end", autocomplete: "new-password" %>
+              </div>
+            </div>
+
+            <!-- Current Password -->
+            <div class="mb-4 position-relative">
+              <%= f.label :current_password, class: "form-label fw-semibold" %>
+              <small class="text-muted d-block mb-2">(required to save changes)</small>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-key text-muted"></i>
+                </span>
+                <%= f.password_field :current_password, class: "form-control py-3 ps-2 border-start-0 rounded-end", required: true, autocomplete: "current-password" %>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid mb-4">
+              <%= f.submit "Update", class: "btn btn-gradient-primary btn-lg fw-semibold py-3" %>
+            </div>
+          <% end %>
+
+          <!-- Cancel Account Button -->
+          <div class="text-center mb-4">
+            <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete, class: "bbtn btn-outline-danger btn-sm fw-semibold" %>
+          </div>
+
+          <!-- Back Link -->
+          <div class="text-center">
+            <%= link_to "Back", pos_path, class: "text-decoration-none fw-semibold" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Optional CSS for gradient button -->
+<style>
+  .btn-gradient-primary {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  .btn-gradient-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+  }
+</style>

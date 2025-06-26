@@ -1,0 +1,12 @@
+<% if object && object.errors.any? %>
+  <div id="error_explanation" class="alert alert-danger" data-turbo-cache="false">
+    <h4 class="alert-heading">
+      <%= t("errors.messages.not_saved", count: object.errors.count, resource: object.model_name.human.downcase) %>
+    </h4>
+    <ul class="mb-0">
+      <% object.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

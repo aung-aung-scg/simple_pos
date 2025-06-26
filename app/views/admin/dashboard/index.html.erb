@@ -1,0 +1,18 @@
+<h1>Admin Dashboard</h1>
+<p>Welcome to the admin dashboard! Here you can manage products, users, and orders.</p>
+
+<!-- Example of Admin-Specific Content -->
+<div class="row">
+  <div class="col-md-4">
+    <h3>Products</h3>
+    <%= link_to "View Products", admin_products_path, class: "btn btn-primary" %>
+  </div>
+  <div class="col-md-4">
+    <h3>Users</h3>
+    <%= link_to "View Users", admin_users_path, class: "btn btn-primary" %>
+  </div>
+  <div class="col-md-4">
+    <h3>Orders</h3>
+    <%= link_to "View Orders", admin_orders_path, class: "btn btn-primary" %>
+  </div>
+</div>
