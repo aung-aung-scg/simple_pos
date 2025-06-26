@@ -1,26 +1,83 @@
-<h2>Log in</h2>
+<div class="container py-5" style="background-color: #f8f9fa;">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg rounded-4 border-0">
+        <!-- Card Header -->
+        <div class="card-header bg-gradient-primary text-white py-4 text-center rounded-top-4">
+          <h1 class="h4 mb-0 d-flex justify-content-center align-items-center">
+            <i class="fas fa-sign-in-alt me-2"></i>
+            <%= t('devise.sessions.new.sign_in') %>
+          </h1>
+        </div>
+        
+        <!-- Card Body -->
+        <div class="card-body p-5">
+          <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "needs-validation", novalidate: true }) do |f| %>
+            <!-- Email Field -->
+            <div class="mb-4 position-relative">
+              <%= f.label :email, class: "form-label fw-semibold" %>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-envelope text-muted"></i>
+                </span>
+                <%= f.email_field :email, class: "form-control py-3 ps-2 border-start-0 rounded-end", placeholder: "you@example.com", required: true, autofocus: true, autocomplete: "email" %>
+                <div class="invalid-feedback">
+                  <%= t('errors.messages.blank') %>
+                </div>
+              </div>
+            </div>
 
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
-  </div>
+            <!-- Password Field -->
+            <div class="mb-4 position-relative">
+              <%= f.label :password, class: "form-label fw-semibold" %>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-lock text-muted"></i>
+                </span>
+                <%= f.password_field :password, class: "form-control py-3 ps-2 border-start-0 rounded-end", placeholder: "Enter your password", required: true, autocomplete: "current-password" %>
+                <div class="invalid-feedback">
+                  <%= t('errors.messages.blank') %>
+                </div>
+              </div>
+            </div>
 
-  <div class="field">
-    <%= f.label :password %><br />
-    <%= f.password_field :password, autocomplete: "current-password" %>
-  </div>
+            <!-- Remember Me Checkbox -->
+            <% if devise_mapping.rememberable? %>
+              <div class="mb-3 form-check d-flex align-items-center">
+                <%= f.check_box :remember_me, class: "form-check-input", id: "rememberMe" %>
+                <%= f.label :remember_me, class: "form-check-label ms-2", for: "rememberMe" %>
+              </div>
+            <% end %>
 
-  <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <%= f.check_box :remember_me %>
-      <%= f.label :remember_me %>
+            <!-- Submit Button -->
+            <div class="d-grid mb-4">
+              <%= f.submit "Sign In", class: "btn btn-gradient-primary btn-lg fw-semibold py-3" %>
+            </div>
+          <% end %>
+
+          <!-- Links -->
+          <div class="d-flex justify-content-center gap-3">
+            <%= render "devise/shared/links" %>
+          </div>
+        </div>
+      </div>
     </div>
-  <% end %>
-
-  <div class="actions">
-    <%= f.submit "Log in" %>
   </div>
-<% end %>
+</div>
 
-<%= render "devise/shared/links" %>
+<!-- Optional CSS for gradient button -->
+<style>
+  .btn-gradient-primary {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  .btn-gradient-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+  }
+</style>
