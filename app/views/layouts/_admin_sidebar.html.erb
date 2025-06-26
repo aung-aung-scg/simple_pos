@@ -3,8 +3,8 @@
   <ul class="nav flex-column">
     <!-- Dashboard -->
     <li class="nav-item">
-      <%= link_to admin_dashboard_path, class: "nav-link d-flex align-items-center" do %>
-        <i class="fa fa-tachometer-alt mr-2"></i> <!-- Dashboard icon -->
+      <%= link_to admin_root_path, class: "nav-link d-flex align-items-center" do %>
+        <i class="fa fa-tachometer-alt me-2"></i> <!-- Dashboard icon -->
         Dashboard
       <% end %>
     </li>
@@ -12,7 +12,7 @@
     <!-- Products -->
     <li class="nav-item">
       <%= link_to admin_products_path, class: "nav-link d-flex align-items-center" do %>
-        <i class="fa fa-cogs mr-2"></i> <!-- Products icon -->
+        <i class="fa fa-cogs me-2"></i> <!-- Products icon -->
         Products
       <% end %>
     </li>
@@ -20,7 +20,7 @@
     <!-- Users -->
     <li class="nav-item">
       <%= link_to admin_users_path, class: "nav-link d-flex align-items-center" do %>
-        <i class="fa fa-users mr-2"></i> <!-- Users icon -->
+        <i class="fa fa-users me-2"></i> <!-- Users icon -->
         Users
       <% end %>
     </li>
@@ -28,20 +28,19 @@
     <!-- Orders -->
     <li class="nav-item">
       <%= link_to admin_orders_path, class: "nav-link d-flex align-items-center" do %>
-        <i class="fa fa-box mr-2"></i> <!-- Orders icon -->
+        <i class="fa fa-box me-2"></i> <!-- Orders icon -->
         Orders
       <% end %>
     </li>
 
     <!-- Logout -->
-   <li class="nav-item">
-  <%= button_to logout_path,
-               method: :delete,
-               class: "nav-link text-danger d-flex align-items-center border-0 bg-transparent p-0" do %>
-    <i class="fa fa-sign-out-alt me-2"></i>
-    Logout
-  <% end %>
-</li>
-  </li>
+    <li class="nav-item">
+      <%= link_to destroy_user_session_path,
+                  method: :delete,
+                  class: "nav-link text-danger d-flex align-items-center" do %>
+        <i class="fa fa-sign-out-alt me-2"></i>
+        Logout
+      <% end %>
+    </li>
   </ul>
 </div>

@@ -12,18 +12,13 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
               <li>
-                <%= link_to edit_user_path(current_user), class: "dropdown-item" do %>
+                <%= link_to edit_user_registration_path, class: "dropdown-item" do %>
                   <i class="fas fa-id-badge me-2"></i> My Profile
-                <% end %>
-              </li>
-              <li>
-                <%= link_to edit_password_path(current_user), class: "dropdown-item" do %>
-                  <i class="fas fa-key me-2"></i> Reset Password
                 <% end %>
               </li>
               <li><hr class="dropdown-divider"></li>
               <li>
-                <%= link_to logout_path, method: :delete, class: "dropdown-item text-danger" do %>
+                <%= link_to destroy_user_session_path, method: :delete, class: "dropdown-item text-danger" do %>
                   <i class="fas fa-sign-out-alt me-2"></i> Logout
                 <% end %>
               </li>
@@ -31,7 +26,7 @@
           </li>
         <% else %>
           <li class="nav-item">
-            <%= link_to "Login", login_path, class: "nav-link" %>
+            <%= link_to "Login", new_user_session_path, class: "nav-link" %>
           </li>
         <% end %>
       </ul>

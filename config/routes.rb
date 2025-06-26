@@ -2,23 +2,24 @@ Rails.application.routes.draw do
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Authentication (using Devise)
+  # Devise Authentication
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     passwords: 'users/passwords'
   }
 
-  # Custom session routes (if keeping non-Devise endpoints)
-  get "login", to: redirect("/users/sign_in") # Consider removing if using pure Devise
-  delete "logout", to: "users/sessions#destroy" # Ensure this matches Devise's route
+  # Remove custom login/logout redirects — Devise handles it
+  # (Optional) You can keep this if you want a friendly /login URL
+  get "login", to: redirect("/users/sign_in")
+  # delete "logout" line removed — use Devise's `destroy_user_session_path` instead
 
-  # User routes
+  # User profile management
   resource :profile, only: [:edit, :update], controller: 'users' do
-    get 'edit_password', on: :collection
-    patch 'update_password', on: :collection
+    get 'edit_password'
+    patch 'update_password'
   end
 
-  # POS routes
+  # POS module routes (no path prefix, but controller under POS module)
   scope module: :pos do
     post "add_to_cart/:product_id", to: "cart#add", as: :add_to_cart
     post "checkout", to: "checkout#process", as: :checkout
@@ -27,7 +28,6 @@ Rails.application.routes.draw do
   # Admin namespace
   namespace :admin do
     root to: 'dashboard#index'
-    get 'dashboard', to: 'dashboard#index' # Consider removing if same as root
 
     resources :products
     resources :users
@@ -39,6 +39,11 @@ Rails.application.routes.draw do
     end
   end
 
-  # Root path - consider making this public facing
-  root to: "admin/dashboard#index" # Might want to change to public page
+  # Redirect users after login to the correct dashboard (optional if handled in `after_sign_in_path_for`)
+  authenticated :user do
+    root to: 'admin/dashboard#index', as: :authenticated_root
+  end
+
+  # Default root path (unauthenticated users)
+  root to: redirect('/users/sign_in')
 end
