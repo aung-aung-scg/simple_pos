@@ -1,0 +1,48 @@
+<h1 class="mb-4 text-center">Your Cart</h1>
+
+<% if @variants.empty? %>
+  <p class="text-center fs-5">Your cart is empty.</p>
+<% else %>
+  <div class="row g-3">
+    <% total = 0 %>
+    <% @variants.each do |variant| %>
+      <% qty = session[:cart][variant.id.to_s] || 0 %>
+      <% subtotal = variant.product.price * qty %>
+      <% total += subtotal %>
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-50 shadow-sm">
+          <% if variant.image.attached? %>
+            <%= image_tag variant.image.variant(resize_to_limit: [300, 300]), class: "card-img-top", alt: variant.product.name %>
+          <% else %>
+            <%= image_tag "https://via.placeholder.com/300?text=No+Image", class: "card-img-top", alt: "No image" %>
+          <% end %>
+
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title"><%= variant.product.name %></h5>
+            <p class="card-text mb-1"><strong>Variant:</strong> <%= "#{variant.color.titleize} / #{variant.size.upcase}" %></p>
+            <p class="card-text mb-2"><strong>Price:</strong> MMK <%= number_with_delimiter(variant.product.price) %></p>
+
+            <div class="d-flex align-items-center mb-3">
+              <%= form_with url: update_cart_item_path(variant), method: :post, local: true, class: "d-flex gap-2 align-items-center flex-grow-1" do |f| %>
+                <%= number_field_tag :quantity, qty, min: 0, class: "form-control text-center", style: "max-width: 70px;" %>
+                <%= f.submit "Update", class: "btn btn-sm btn-primary" %>
+              <% end %>
+
+              <%= button_to remove_item_from_cart_path(variant), method: :post, data: { confirm: "Are you sure?" }, class: "btn btn-sm btn-danger ms-2" do %>
+                Remove
+              <% end %>
+            </div>
+
+            <p class="mt-auto fw-bold">Subtotal: MMK <%= number_with_delimiter(subtotal) %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="text-end mt-4">
+    <h4>Total: MMK <%= number_with_delimiter(total) %></h4>
+    <%= button_to "Proceed to Checkout", checkout_path, method: :post, class: "btn btn-lg btn-success mt-3" %>
+  </div>
+<% end %>

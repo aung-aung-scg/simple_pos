@@ -1,45 +1,176 @@
-<h1>Your Cart</h1>
+<h2 class="text-center mb-5 display-5 fw-bold"><%= @product.name %></h2>
 
-<% if @cart.empty? %>
-  <p>Your cart is empty.</p>
-<% else %>
-  <div class="table-responsive">
-    <table class="table table-striped align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>Product</th>
-          <th>Qty</th>
-          <th>Price</th>
-          <th>Subtotal</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @products.each do |product| %>
-          <tr>
-            <td><%= product.name %></td>
-            <td><%= @cart[product.id.to_s] %></td>
-            <td>MMK <%= number_with_delimiter(product.price) %></td>
-            <td>MMK <%= number_with_delimiter(product.price * @cart[product.id.to_s]) %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+<div class="row gy-5 align-items-start">
+  <!-- Product Image -->
+  <div class="col-lg-6 text-center">
+    <% if @variants.first&.image&.attached? %>
+      <%= image_tag @variants.first.image.variant(resize_to_limit: [450, 450]), id: "variant-image", alt: @product.name, class: "img-fluid rounded-4 shadow-sm border" %>
+    <% else %>
+      <div class="d-flex align-items-center justify-content-center bg-light rounded-4 shadow-sm" style="height: 400px;">
+        <span class="text-muted fs-5">No Image Available</span>
+      </div>
+    <% end %>
   </div>
 
-  <p class="fs-5 fw-semibold">
-    <strong>Total:</strong> MMK <%= number_with_delimiter(@products.sum { |p| p.price * @cart[p.id.to_s] }) %>
-  </p>
+  <!-- Product Options -->
+  <div class="col-lg-6">
+    <div class="mb-4">
+      <span class="fs-6 text-muted">Price</span>
+      <p class="fs-2 fw-bold text-primary mb-0">MMK <%= number_with_delimiter(@product.price) %></p>
+    </div>
 
-  <%= button_to "Place Order", checkout_path, method: :post, class: "btn btn-primary btn-lg" %>
-<% end %>
+    <%= form_with url: add_to_cart_pos_path, method: :post, local: true, id: "variant-selection-form" do %>
+    <!-- Color Selection -->
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Choose Color</label>
+        <div id="color-options" class="d-flex flex-wrap gap-2">
+          <% @available_colors.each do |color| %>
+            <input type="radio" name="color" id="color-<%= color %>" value="<%= color %>" class="btn-check color-radio" autocomplete="off">
+            <label class="btn btn-dark" for="color-<%= color %>"><%= color.titleize %></label>
+          <% end %>
+        </div>
+        <div class="invalid-feedback d-block text-danger" id="color-error" style="display: none;">Please select a color.</div>
+      </div>
 
-<style>
-  #cart-icon {
-    position: relative;
+      <!-- Size Selection -->
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Choose Size</label>
+        <div id="size-options" class="d-flex flex-wrap gap-2"></div>
+        <div class="invalid-feedback d-block text-danger" id="size-error" style="display: none;">Please select a size.</div>
+      </div>
+
+      <!-- Stock Info -->
+      <div id="stock-info" class="mb-3 fs-5 fw-medium text-secondary"></div>
+
+      <%= hidden_field_tag :variant_id, nil, id: "variant-id-field" %>
+
+      <button type="submit" class="btn btn-lg btn-primary w-100" disabled id="add-to-cart-btn">
+        <i class="bi bi-cart-plus me-2"></i> Add to Cart
+      </button>
+    <% end %>
+  </div>
+</div>
+<script>
+  const variants = <%= raw @variants.to_json(only: [:id, :color, :size, :stock], methods: [:image_url]) %>;
+
+  function updateSizes(color) {
+    const sizeContainer = document.getElementById('size-options');
+    sizeContainer.innerHTML = '';
+
+    const filtered = variants.filter(v => v.color === color);
+    const uniqueSizes = [...new Set(filtered.map(v => v.size))];
+
+    uniqueSizes.forEach(size => {
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'size';
+      input.id = `size-${size}`;
+      input.className = 'btn-check size-radio';
+      input.value = size;
+      input.autocomplete = 'off';
+
+      const label = document.createElement('label');
+      label.className = 'btn btn-primary';
+      label.htmlFor = `size-${size}`;
+      label.textContent = size;
+
+      sizeContainer.appendChild(input);
+      sizeContainer.appendChild(label);
+    });
+
+    clearSelection();
+
+    const firstImage = filtered.find(v => v.image_url);
+    if (firstImage) {
+      document.getElementById('variant-image').src = firstImage.image_url;
+    }
+
+    // Add event listeners for new size radios
+    document.querySelectorAll('.size-radio').forEach(radio => {
+      radio.addEventListener('change', e => {
+        const selectedColor = document.querySelector('.color-radio:checked')?.value;
+        if (selectedColor) {
+          updateStock(selectedColor, e.target.value);
+          document.getElementById('size-error').style.display = 'none';
+        }
+      });
+    });
   }
 
-  #cart-icon .badge {
-    font-size: 0.7rem;
-    padding: 0.25em 0.4em;
+  function clearSelection() {
+    document.getElementById('stock-info').textContent = "";
+    document.getElementById('variant-id-field').value = "";
+    document.getElementById('add-to-cart-btn').disabled = true;
+  }
+
+  function updateStock(color, size) {
+    const variant = variants.find(v => v.color === color && v.size === size);
+    const variantImage = document.getElementById('variant-image');
+
+    if (variant) {
+      document.getElementById('stock-info').textContent = `Stock: ${variant.stock}`;
+      document.getElementById('variant-id-field').value = variant.id;
+      document.getElementById('add-to-cart-btn').disabled = variant.stock <= 0;
+
+      if (variant.image_url) {
+        variantImage.src = variant.image_url;
+      }
+    } else {
+      document.getElementById('stock-info').textContent = "Variant not available";
+      document.getElementById('variant-id-field').value = "";
+      document.getElementById('add-to-cart-btn').disabled = true;
+    }
+  }
+
+  document.querySelectorAll('.color-radio').forEach(radio => {
+    radio.addEventListener('change', e => {
+      updateSizes(e.target.value);
+      document.getElementById('color-error').style.display = 'none';
+    });
+  });
+
+  // Bootstrap-like validation
+  document.getElementById('variant-selection-form').addEventListener('submit', function (e) {
+    const selectedColor = document.querySelector('.color-radio:checked');
+    const selectedSize = document.querySelector('.size-radio:checked');
+
+    let valid = true;
+
+    if (!selectedColor) {
+      document.getElementById('color-error').style.display = 'block';
+      valid = false;
+    }
+
+    if (!selectedSize) {
+      document.getElementById('size-error').style.display = 'block';
+      valid = false;
+    }
+
+    if (!valid) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+</script>
+<style>
+  .color-swatch {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    padding: 0;
+    text-transform: capitalize;
+  }
+
+  .btn-check:checked + .color-swatch {
+    border: 3px solid #000;
+  }
+
+  .btn-check:checked + .color-swatch {
+    border: 3px solid #333;
   }
 </style>

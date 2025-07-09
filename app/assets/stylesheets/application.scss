@@ -69,3 +69,30 @@
     padding: 10px;  // Extra padding for content spacing
   }
 
+   .page-title {
+    font-size: 1.5rem;
+    color: #2c3e50;
+  }
+  
+  .table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .stock-indicator.text-success::before {
+    content: "✓ ";
+  }
+  
+  .stock-indicator.text-danger::before {
+    content: "⚠ ";
+  }
+  
+  .card {
+    border-radius: 0.5rem;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: rgba(0,0,0,0.02);
+  }
