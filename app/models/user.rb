@@ -7,6 +7,7 @@ class User < ApplicationRecord
 
   # Default role for new users
   after_initialize :set_default_role, if: :new_record?
+  has_many :orders, dependent: :destroy
 
   private
 

@@ -25,8 +25,8 @@
         <tr>
           <td><%= item.product.name %></td>
           <td><%= item.quantity %></td>
-          <td><%= number_to_currency(item.product.price) %></td>
-          <td><%= number_to_currency(item.product.price * item.quantity) %></td>
+          <td><%= number_to_currency(item.product.price, unit: "MMK") %></td>
+          <td><%= number_to_currency(item.product.price * item.quantity, unit: "MMK") %></td>
         </tr>
       <% end %>
     </tbody>

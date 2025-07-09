@@ -19,11 +19,15 @@ Rails.application.routes.draw do
     patch 'update_password'
   end
 
-  # POS module routes (no path prefix, but controller under POS module)
-  post "add_to_cart/:product_id", to: "pos#add_to_cart", as: :add_to_cart
-  post "checkout", to: "pos#checkout", as: :checkout
-  get 'cart', to: 'pos#show', as: :pos_cart
-  get "pos", to: "pos#index", as: :pos
+  resources :pos, only: [:index, :show] do
+    post :add_to_cart, on: :collection
+  end
+  get 'cart', to: 'pos#cart', as: :pos_cart
+  post 'checkout', to: 'pos#checkout', as: :checkout
+  resources :orders, only: [:index, :show]
+  post 'cart/add/:variant_id', to: 'pos#add_to_cart', as: :add_item_to_cart
+  post 'cart/remove/:variant_id', to: 'pos#remove_from_cart', as: :remove_item_from_cart
+  post 'cart/update/:variant_id', to: 'pos#update_cart_item', as: :update_cart_item
 
   # Admin namespace
   namespace :admin do

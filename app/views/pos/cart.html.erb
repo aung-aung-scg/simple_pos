@@ -1,0 +1,104 @@
+<h1 class="mb-4 text-center">Your Cart</h1>
+
+<% if @variants.empty? %>
+  <div class="text-center py-5 bg-light rounded-3">
+    <p class="fs-4 text-muted mb-4">Your cart is empty</p>
+    <%= link_to "Continue Shopping", products_path, class: "btn btn-primary btn-lg px-4 py-2" %>
+  </div>
+<% else %>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 120px">Product</th>
+          <th>Details</th>
+          <th style="width: 150px">Price</th>
+          <th style="width: 180px">Quantity</th>
+          <th style="width: 120px">Subtotal</th>
+          <th style="width: 80px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% total = 0 %>
+        <% @variants.each do |variant| %>
+          <% qty = session[:cart][variant.id.to_s] || 0 %>
+          <% subtotal = variant.product.price * qty %>
+          <% total += subtotal %>
+          
+          <tr>
+            <td>
+              <% if variant.image.attached? %>
+                <%= image_tag variant.image.variant(resize_to_limit: [100, 100]), class: "img-thumbnail", alt: variant.product.name %>
+              <% else %>
+                <div class="img-thumbnail d-flex align-items-center justify-content-center bg-light" style="width: 100px; height: 100px;">
+                  <span class="text-muted small">No image</span>
+                </div>
+              <% end %>
+            </td>
+            <td>
+              <h5 class="mb-1"><%= variant.product.name %></h5>
+              <div class="text-muted">
+                <span class="me-2"><%= variant.color.titleize %></span>
+                <span><%= variant.size.upcase %></span>
+              </div>
+            </td>
+            <td class="fw-bold">MMK <%= number_with_delimiter(variant.product.price) %></td>
+            <td>
+              <%= form_with url: update_cart_item_path(variant), method: :post, local: true, class: "d-flex" do |f| %>
+                <div class="input-group">
+                  <%= number_field_tag :quantity, qty, min: 1, class: "form-control" %>
+                  <%= f.submit "Update", class: "btn btn-primary" %>
+                </div>
+              <% end %>
+            </td>
+            <td class="fw-bold">MMK <%= number_with_delimiter(subtotal) %></td>
+            <td class="text-end">
+              <%= button_to remove_item_from_cart_path(variant), method: :post, 
+                  data: { confirm: "Remove this item?" }, 
+                  class: "btn btn-danger",
+                  title: "Remove" do %>
+                <i class="fas fa-trash-alt"></i>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot class="table-group-divider">
+        <tr>
+          <td colspan="4" class="text-end fw-bold">Total:</td>
+          <td class="fw-bold fs-5 text-primary">MMK <%= number_with_delimiter(total) %></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="d-flex justify-content-between mt-4 gap-3">
+    <%= link_to "← Continue Shopping", pos_path, class: "btn btn-outline-primary px-4 py-2 flex-grow-1" %>
+    <%= button_to "Proceed to Checkout →", checkout_path, method: :post, class: "btn btn-success px-4 py-2 flex-grow-1" %>
+  </div>
+<% end %>
+
+<style>
+  /* Additional styling to ensure button visibility */
+  .btn {
+    border-width: 2px;
+    font-weight: 500;
+  }
+  .btn-outline-primary {
+    color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  .btn-outline-primary:hover {
+    color: #fff;
+    background-color: #0d6efd;
+  }
+  .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+  }
+</style>

@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
       redirect_to new_user_session_path, alert: "Please login"
     else
       unless admin?
-        redirect_to root_path, alert: "Not authorized"
+        redirect_to pos_path
       end
     end
   end
