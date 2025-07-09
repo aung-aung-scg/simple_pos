@@ -6,7 +6,7 @@
         <%= @product.new_record? ? 'Add New Product' : 'Edit Product' %>
       </h1>
       <div>
-        <%= link_to "Cancel", admin_products_path, class: "btn btn-outline-secondary me-2" %>
+        <%= link_to "Cancel", admin_products_path, class: "btn btn-secondary me-2" %>
         <%= form.submit @product.new_record? ? 'Create Product' : 'Update Product', class: 'btn btn-primary px-4' %>
       </div>
     </div>
@@ -43,7 +43,7 @@
         <div class="card shadow-sm mb-4">
           <div class="card-header bg-light d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Product Variants</h5>
-            <button type="button" class="btn btn-sm btn-outline-primary" id="add-variant-btn">
+            <button type="button" class="btn btn-sm btn-primary" id="add-variant-btn">
               <i class="fas fa-plus me-1"></i> Add Variant
             </button>
           </div>
@@ -98,7 +98,7 @@
           <div class="card-body">
             <div class="d-grid gap-2">
               <%= form.submit @product.new_record? ? 'Create Product' : 'Update Product', class: 'btn btn-primary' %>
-              <%= link_to "Cancel", admin_products_path, class: "btn btn-outline-secondary" %>
+              <%= link_to "Cancel", admin_products_path, class: "btn btn-secondary" %>
             </div>
             
             <% unless @product.new_record? %>
@@ -107,7 +107,7 @@
                 <%= link_to "Delete Product", admin_product_path(@product), 
                     method: :delete, 
                     data: { confirm: "Are you sure you want to delete this product?" },
-                    class: "btn btn-outline-danger" %>
+                    class: "btn btn-danger" %>
               </div>
             <% end %>
           </div>

@@ -51,7 +51,7 @@
   </div>
 </div>
 <script>
-  const variants = <%= raw @variants.to_json(only: [:id, :color, :size, :stock], methods: [:image_url]) %>;
+  let variants = <%= raw @variants.to_json(only: [:id, :color, :size, :stock], methods: [:image_url]) %>;
 
   function updateSizes(color) {
     const sizeContainer = document.getElementById('size-options');

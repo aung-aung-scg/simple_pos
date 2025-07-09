@@ -61,7 +61,7 @@ class PosController < ApplicationController
 
         variant.update!(stock: variant.stock - quantity) # ↓ subtract stock
 
-        OrderItem.create!(order: order, product: variant.product, quantity: quantity)
+        OrderItem.create!(order: order, product: variant.product, quantity: quantity, product_variant: variant,)
         total += variant.product.price * quantity
       end
 
