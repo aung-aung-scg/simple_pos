@@ -1,27 +1,67 @@
-<h1 class="mb-4 text-center">Products</h1>
+<!-- 🧱 Category Tiles -->
+<section class="mb-5">
+  <h2 class="mb-4 text-center fw-bold">Shop by Category</h2>
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
-  <% @products.each do |product| %>
-    <% first_variant = product.product_variants.first %>
-    <div class="col">
-      <div class="card h-100 shadow-sm">
-        <%= link_to url_for(controller: :pos, action: :show, id: product.id), class: "text-decoration-none text-dark" do %>
-          <% if first_variant&.image&.attached? %>
-            <%= image_tag first_variant.image.variant(resize_to_limit: [150, 150]), class: "card-img-top mx-auto d-block pt-3", alt: product.name, style: "width:150px; height:150px; object-fit: contain;" %>
-          <% else %>
-            <%= image_tag "https://via.placeholder.com/150?text=No+Image", class: "card-img-top mx-auto d-block pt-3", alt: "No image available", style: "width:150px; height:150px; object-fit: contain;" %>
+  <% category_images = {
+    "men" => "https://images.unsplash.com/photo-1598032892841-9a8e7a97a5a9?fit=crop&w=800&q=80",
+    "women" => "https://images.unsplash.com/photo-1533719181288-5e44ad2b7430?fit=crop&w=800&q=80",
+    "kid" => "https://images.unsplash.com/photo-1523293832810-6c5e4d284b80?fit=crop&w=800&q=80",
+    "top" => "https://images.unsplash.com/photo-1562158070-57f3c198a7b6?fit=crop&w=800&q=80",
+    "under" => "https://images.unsplash.com/photo-1603252109303-2751441c3328?fit=crop&w=800&q=80",
+    "shoes" => "https://images.unsplash.com/photo-1618354691419-3e6145efdcf6?fit=crop&w=800&q=80",
+    "accessories" => "https://images.unsplash.com/photo-1600180758890-6ac1c3a7b816?fit=crop&w=800&q=80"
+  } %>
+
+  <div class="row row-cols-2 row-cols-md-4 g-4">
+    <% [["Men", "men"], ["Women", "women"], ["Kids", "kid"], ["Top", "top"], ["Under", "under"], ["Shoes", "shoes"], ["Accessories", "accessories"]].each do |label, value| %>
+      <div class="col">
+        <div class="card h-100 border-0 shadow-sm text-center">
+          <%= link_to pos_path(gender: value, category: value), class: "text-decoration-none text-dark" do %>
+            <%= image_tag category_images[value], class: "card-img-top", style: "object-fit: cover; height: 160px;" %>
+            <div class="card-body">
+              <h5 class="card-title fw-semibold"><%= label %></h5>
+            </div>
           <% end %>
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h5 class="card-title text-center"><%= product.name %></h5>
-            <p class="card-text text-center text-primary fs-5 fw-bold">MMK <%= product.price %></p>
-            <% if first_variant&.stock.to_i > 0 %>
-              <span class="badge bg-success text-center d-block">In Stock</span>
-            <% else %>
-              <span class="badge bg-danger text-center d-block">Sold Out</span>
-            <% end %>
-          </div>
-        <% end %>
+        </div>
       </div>
-    </div>
-  <% end %>
-</div>
+    <% end %>
+  </div>
+</section>
+
+<!-- 🛍️ Product Listing -->
+<section>
+  <h2 class="mb-4 text-center fw-bold">Featured Products</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    <% @products.each do |product| %>
+      <% first_variant = product.product_variants.first %>
+      <div class="col">
+        <div class="card h-100 shadow-sm border-0">
+          <%= link_to url_for(controller: :pos, action: :show, id: product.id), class: "text-decoration-none text-dark" do %>
+            <% if first_variant&.image&.attached? %>
+              <%= image_tag first_variant.image.variant(resize_to_limit: [300, 300]), class: "card-img-top", alt: product.name, style: "object-fit: contain; height: 220px;" %>
+            <% else %>
+              <%= image_tag "https://via.placeholder.com/300x300?text=No+Image", class: "card-img-top", style: "object-fit: contain; height: 220px;" %>
+            <% end %>
+            <div class="card-body text-center d-flex flex-column justify-content-between">
+              <h5 class="card-title"><%= product.name %></h5>
+              <p class="fs-5 fw-bold text-primary">MMK <%= number_with_delimiter(product.price) %></p>
+              <% if first_variant&.stock.to_i > 0 %>
+                <span class="badge bg-success">In Stock</span>
+              <% else %>
+                <span class="badge bg-danger">Sold Out</span>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>
+<style>
+  .card-img-top {
+    transition: transform 0.3s ease;
+  }
+  .card:hover .card-img-top {
+    transform: scale(1.05);
+  }
+</style>

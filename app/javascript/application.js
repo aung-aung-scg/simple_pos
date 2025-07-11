@@ -2,6 +2,9 @@ import "jquery"
 import * as bootstrap from "bootstrap"
 import "@hotwired/turbo-rails"
 
+window.$ = jquery;
+window.jQuery = jquery;
+
 // Initialize Bootstrap tooltips AFTER Turbo loads
 document.addEventListener("turbo:load", () => {
   const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
