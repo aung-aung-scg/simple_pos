@@ -40,8 +40,14 @@ class Admin::UsersController < ApplicationController
   end
 
   def destroy
-    @user.destroy
-    redirect_to admin_users_path, notice: "User deleted."
+    @user = User.find(params[:id])
+
+    if @user.deletable?
+      @user.destroy
+      redirect_to admin_users_path, notice: 'User was successfully deleted.'
+    else
+      redirect_to admin_users_path, alert: 'This user cannot be deleted.'
+    end
   end
 
   private

@@ -25,8 +25,8 @@
       <div class="row mb-3">
         <label class="col-sm-3 col-form-label text-end"><%= form.label :phone %></label>
         <div class="col-sm-9">
-          <%= form.telephone_field :phone_number, class: "form-control" %>
-          <small class="form-text text-muted">Format: 123-456-7890</small>
+          <%= form.telephone_field :phone, class: "form-control", pattern: '\d{2}-\d{7,}', title: "Format: 09-12345678" %>
+          <small class="form-text text-muted">Format: 0912345</small>
         </div>
       </div>
 

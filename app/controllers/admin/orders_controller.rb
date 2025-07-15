@@ -27,7 +27,7 @@ class Admin::OrdersController < ApplicationController
     if @order.update(status: params[:status])
       redirect_to admin_orders_path, notice: "Order status updated"
     else
-      render_errors(@order)
+      redirect_to admin_orders_path, alert: "Failed to update status"
     end
   end
 

@@ -33,12 +33,26 @@ class User < ApplicationRecord
   has_many :orders, dependent: :destroy
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :name, presence: true, length: { maximum: 100 }
-  validates :phone, presence: true, format: { with: /\A\+?[\d\s\-]+\z/, message: "should only contain numbers, spaces, or dashes" }
+  validates :phone, presence: true
   validates :address, presence: true, length: { maximum: 500 }
+  before_validation :normalize_phone_number
+  validates :password, length: { minimum: 8 }, if: -> { new_record? || !password.nil? }
+
+  def formatted_phone
+    phone.gsub(/(\d{2})(\d{3})(\d{4})/, '\1-\2-\3') if phone.present?
+  end
+
+  def deletable?
+    id != 1 && !admin?
+  end
 
   private
 
   def set_default_role
     self.role ||= :user
+  end
+
+  def normalize_phone_number
+    self.phone = phone.gsub(/[^\d]/, '') if phone.present?
   end
 end

@@ -32,6 +32,7 @@ class Order < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :by_status, ->(status) { where(status: status) if status.present? }
   validates :status, inclusion: { in: %w[pending processing shipped completed cancelled] }
+
   def status_badge_class
     case status.to_s.downcase
     when 'pending', 'new'
