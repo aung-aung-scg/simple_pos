@@ -6,7 +6,7 @@ class PosController < ApplicationController
     @products = do_search(@products)
     @products = do_filter(@products)
     @products = do_sort(@products)
-    @products = @products.page(params[:page]).per(9)
+    @products = @products.page(params[:page]).per(10)
     @cart = session[:cart] || {}
   end
 
@@ -105,12 +105,23 @@ class PosController < ApplicationController
   end
 
   def do_filter(products)
+    # Filter by gender if given
+    products = products.where(gender: params[:gender]) if params[:gender].present?
+
+    # Filter by category name if given
+    if params[:category].present?
+      category = Category.find_by(name: params[:category])
+      products = products.where(category_id: category.id) if category
+    end
+
+    # Filter by stock status
     case params[:stock]
     when "in_stock"
       products = products.joins(:product_variants).where("product_variants.stock > 0").distinct
     when "sold_out"
       products = products.joins(:product_variants).where("product_variants.stock <= 0").distinct
     end
+
     products
   end
 

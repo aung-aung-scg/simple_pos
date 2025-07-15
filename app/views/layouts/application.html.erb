@@ -9,14 +9,17 @@
 
     <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <script type="module">
+      import "application"
+    </script>
   </head>
    <body>
     <!-- Header -->
     <%= render 'layouts/header' %>
 
-    <% if notice %>
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <%= notice %>
+    <% flash.each do |type, message| %>
+      <div class="alert alert-<%= bootstrap_alert_class(type) %> alert-dismissible fade show">
+        <%= message %>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     <% end %>

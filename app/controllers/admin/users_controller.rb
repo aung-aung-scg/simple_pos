@@ -1,4 +1,5 @@
 class Admin::UsersController < ApplicationController
+  include ErrorHandler
   layout "admin"
   before_action :authenticate_admin!
   before_action :set_user, only: [:show, :edit, :update, :destroy]
@@ -50,6 +51,6 @@ class Admin::UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:name, :email, :password, :password_confirmation, :role)
+    params.require(:user).permit(:name, :email, :password, :password_confirmation, :role, :phone, :address)
   end
 end

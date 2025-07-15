@@ -1,7 +1,7 @@
 <!-- Breadcrumbs -->
 <nav aria-label="breadcrumb" class="mb-4">
   <ol class="breadcrumb text-uppercase small">
-    <li class="breadcrumb-item text-muted"><%= @product.category&.parent&.name || @product.gender %></li>
+    <li class="breadcrumb-item text-muted"><%= @product.gender %></li>
     <li class="breadcrumb-item text-muted"><%= @product.category&.name %></li>
     <li class="breadcrumb-item active text-dark" aria-current="page"><%= @product.name %></li>
   </ol>

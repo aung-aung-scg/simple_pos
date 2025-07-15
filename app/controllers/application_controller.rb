@@ -19,4 +19,17 @@ class ApplicationController < ActionController::Base
   def after_sign_in_path_for(resource)
     resource.admin? ? admin_root_path : pos_path
   end
+
+  def render_errors(object)
+    respond_to do |format|
+      format.html { render :edit, status: :unprocessable_entity }
+      format.turbo_stream {
+        render turbo_stream: turbo_stream.replace(
+          "error_explanation",
+          partial: "shared/error_messages",
+          locals: { object: object }
+        )
+      }
+    end
+  end
 end

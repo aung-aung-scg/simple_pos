@@ -35,7 +35,11 @@ Rails.application.routes.draw do
 
     resources :products
     resources :users
-    resources :orders, only: [:index, :show]
+    resources :orders do
+      member do
+        patch :update_status
+      end
+    end
 
     resource :profile, only: [] do
       get 'edit'

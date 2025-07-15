@@ -3,10 +3,12 @@
 # Table name: users
 #
 #  id                     :integer          not null, primary key
+#  address                :text
 #  admin                  :boolean
 #  email                  :string
 #  encrypted_password     :string           default("")
 #  name                   :string
+#  phone                  :string
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
@@ -31,6 +33,8 @@ class User < ApplicationRecord
   has_many :orders, dependent: :destroy
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :name, presence: true, length: { maximum: 100 }
+  validates :phone, presence: true, format: { with: /\A\+?[\d\s\-]+\z/, message: "should only contain numbers, spaces, or dashes" }
+  validates :address, presence: true, length: { maximum: 500 }
 
   private
 

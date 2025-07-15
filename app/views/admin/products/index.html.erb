@@ -14,7 +14,6 @@
               <th>Product Name</th>
               <th>Description</th>
               <th style="width: 120px;">Price</th>
-              <th style="width: 320px;">Variants</th>
               <th style="width: 130px;">Actions</th>
             </tr>
           </thead>
@@ -25,34 +24,6 @@
                 <td><strong><%= product.name %></strong></td>
                 <td><small class="text-muted"><%= truncate(product.description, length: 50) %></small></td>
                 <td class="text-success"><strong><%= number_to_currency(product.price, unit: "MMK") %></strong></td>
-
-                <td style="max-height: 180px; overflow-y: auto; padding: 0.25rem;">
-                  <% if product.product_variants.any? %>
-                    <% product.product_variants.each do |variant| %>
-                      <div class="card mb-2 p-2 shadow-sm">
-                        <div class="d-flex align-items-center">
-                          <% if variant.image.attached? %>
-                            <%= image_tag variant.image.variant(resize_to_limit: [50, 50]),
-                                          class: "img-thumbnail me-3", style: "width: 50px; height: 50px; object-fit: cover;" %>
-                          <% else %>
-                            <div class="bg-light border text-center me-3" style="width:50px; height:50px; line-height:50px; font-size:0.8rem; color:#999;">
-                              No Image
-                            </div>
-                          <% end %>
-                          <div>
-                            <div><strong>Color:</strong> <span class="badge" style="background-color: <%= variant.color.downcase == 'black' ? '#000' : variant.color.downcase %>; color: <%= variant.color.downcase == 'black' ? '#fff' : '#000' %>"><%= variant.color %></span></div>
-                            <div><strong>Size:</strong> <%= variant.size %></div>
-                            <div class="stock-indicator <%= variant.stock > 10 ? 'text-success' : 'text-danger' %>">
-                              <small><strong>Stock:</strong> <%= variant.stock %></small>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    <% end %>
-                  <% else %>
-                    <span class="badge bg-secondary">No variants</span>
-                  <% end %>
-                </td>
 
                 <td>
                   <div class="btn-group btn-group-sm" role="group">
