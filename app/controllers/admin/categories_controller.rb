@@ -3,7 +3,11 @@ class Admin::CategoriesController < ApplicationController
   layout "admin"
 
   def index
-    @categories = Category.all.order(:name)
+    @categories = Category.left_joins(:products)
+                        .select('categories.*, COUNT(products.id) as products_count')
+                        .group('categories.id')
+                        .order("#{sort_column} #{sort_direction}")
+                        .page(params[:page]).per(10)
   end
 
   def show
@@ -11,7 +15,7 @@ class Admin::CategoriesController < ApplicationController
 
   def new
     @category = Category.new
-    @parent_categories = Category.where(parent_id: nil)
+    load_parent_categories
   end
 
   def create
@@ -19,20 +23,20 @@ class Admin::CategoriesController < ApplicationController
     if @category.save
       redirect_to admin_categories_path, notice: 'Category was successfully created.'
     else
-      @parent_categories = Category.where(parent_id: nil)
+      load_parent_categories
       render :new
     end
   end
 
   def edit
-    @parent_categories = Category.where(parent_id: nil).where.not(id: @category.id)
+    load_parent_categories(exclude_current: true)
   end
 
   def update
     if @category.update(category_params)
       redirect_to admin_categories_path, notice: 'Category was successfully updated.'
     else
-      @parent_categories = Category.where(parent_id: nil).where.not(id: @category.id)
+      load_parent_categories(exclude_current: true)
       render :edit
     end
   end
@@ -49,6 +53,19 @@ class Admin::CategoriesController < ApplicationController
   end
 
   def category_params
-    params.require(:category).permit(:name, :parent_id)
+    params.require(:category).permit(:name, :parent_id, :position)
+  end
+
+    def sort_column
+      %w[id name products_count created_at].include?(params[:sort]) ? params[:sort] : "name"
+    end
+
+    def sort_direction
+      %w[asc desc].include?(params[:direction]) ? params[:direction] : "asc"
+    end
+
+  def load_parent_categories(exclude_current: false)
+    @parent_categories = Category.where(parent_id: nil)
+    @parent_categories = @parent_categories.where.not(id: @category.id) if exclude_current && @category
   end
 end

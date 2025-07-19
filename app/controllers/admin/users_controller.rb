@@ -5,7 +5,8 @@ class Admin::UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
 
   def index
-    @users = User.all
+    @users = User.order("#{sort_column} #{sort_direction}")
+               .page(params[:page]).per(25)
   end
 
   def show
@@ -51,6 +52,14 @@ class Admin::UsersController < ApplicationController
   end
 
   private
+
+  def sort_column
+    %w[id name email created_at updated_at role].include?(params[:sort]) ? params[:sort] : "created_at"
+  end
+
+  def sort_direction
+    %w[asc desc].include?(params[:direction]) ? params[:direction] : "desc"
+  end
 
   def set_user
     @user = User.find(params[:id])

@@ -6,7 +6,7 @@ class Admin::OrdersController < ApplicationController
 
   def index
     @orders = Order.includes(:user, order_items: { product: :product_variants })
-                 .order(created_at: :desc)
+                 .order("#{sort_column} #{sort_direction}")
                  .page(params[:page]).per(25)
   end
 
@@ -37,5 +37,12 @@ class Admin::OrdersController < ApplicationController
     @order = Order.includes(order_items: { product: :product_variants }).find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to admin_orders_path, alert: "Order not found."
+  end
+  def sort_column
+    %w[id created_at updated_at status total_price].include?(params[:sort]) ? params[:sort] : "created_at"
+  end
+
+  def sort_direction
+    %w[asc desc].include?(params[:direction]) ? params[:direction] : "desc"
   end
 end

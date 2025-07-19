@@ -5,7 +5,9 @@ class Admin::ProductsController < ApplicationController
   before_action :set_product, only: [:show, :edit, :update, :destroy]
 
   def index
-    @products = Product.includes(:category, :product_variants).all
+    @products = Product.includes(:category, :product_variants)
+                     .order("#{sort_column} #{sort_direction}")
+                     .page(params[:page]).per(25)
   end
 
   def new
@@ -56,6 +58,14 @@ class Admin::ProductsController < ApplicationController
     @product = Product.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to admin_products_path, alert: "Product not found."
+  end
+
+  def sort_column
+    %w[id name price created_at updated_at].include?(params[:sort]) ? params[:sort] : "created_at"
+  end
+
+  def sort_direction
+    %w[asc desc].include?(params[:direction]) ? params[:direction] : "desc"
   end
 
   def product_params
