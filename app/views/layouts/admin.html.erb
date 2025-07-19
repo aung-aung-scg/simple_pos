@@ -147,6 +147,13 @@
               Orders
             <% end %>
           </li>
+
+          <li class="nav-item mb-2">
+            <%= link_to admin_users_path, class: "nav-link d-flex align-items-center #{'active' if current_page?(admin_users_path)}" do %>
+              <i class="bi bi-people me-3"></i>
+              Users
+            <% end %>
+          </li>
         </ul>
       </div>
     </aside>

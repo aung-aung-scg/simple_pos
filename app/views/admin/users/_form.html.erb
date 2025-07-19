@@ -5,6 +5,25 @@
     </div>
     <div class="card-body">
 
+      <div class="row mb-4">
+        <label class="col-sm-3 col-form-label text-end">Profile Image</label>
+        <div class="col-sm-9">
+          <%= form.file_field :profile_image, class: "form-control mb-2" %>
+          
+          <% if @user.profile_image.attached? %>
+            <div class="d-flex align-items-center mt-2">
+              <%= image_tag @user.profile_image.variant(resize_to_limit: [100, 100]), 
+                          class: "rounded-circle me-3", 
+                          style: "width: 100px; height: 100px; object-fit: cover;" %>
+              <div class="form-check">
+                <%= form.check_box :remove_profile_image, class: "form-check-input" %>
+                <%= form.label :remove_profile_image, "Remove current image", class: "form-check-label" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+       
       <!-- Name -->
       <div class="row mb-3">
         <label class="col-sm-3 col-form-label text-end"><%= form.label :name %></label>
