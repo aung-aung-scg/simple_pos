@@ -8,32 +8,68 @@
     <%= csp_meta_tag %>
 
     <%= stylesheet_link_tag "application", media: "all", "data-turbo-track": "reload" %>
-    <%= javascript_include_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>    
   </head>
 
-  <body class="bg-light">
+  <body>
     <!-- Admin Header -->
     <%= render 'layouts/admin_header' %>
 
-    <div class="container-fluid d-flex p-0">
-      <!-- Sidebar -->
-      <div class="col-md-2 bg-light min-vh-100 p-3 border-right">
-        <%= render 'layouts/admin_sidebar' %>  <!-- Sidebar links for admin -->
-      </div>
+    <!-- Sidebar -->
+    <%= render 'layouts/admin_sidebar' %>
 
-      <!-- Main Content -->
-      <div class="col-md-9 p-4">
+    <!-- Main Content -->
+    <main class="admin-main">
+      <div class="container-fluid p-4">
         <% flash.each do |type, message| %>
-          <div class="alert alert-<%= bootstrap_alert_class(type) %> alert-dismissible fade show" role="alert">
+          <div class="alert alert-<%= bootstrap_alert_class(type) %> alert-dismissible fade show mb-4">
             <%= message %>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         <% end %>
-        <%= yield %>  <!-- Main content for the admin pages -->
+        <%= yield %>
       </div>
-    </div>
+    </main>
 
-    <!-- Admin Footer -->
-    <%= render 'layouts/footer' %>
+    <script>
+      document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+        document.getElementById('adminSidebar').classList.toggle('show');
+      });
+    </script>
   </body>
 </html>
+
+ <style>
+      :root {
+        --sidebar-width: 250px;
+        --header-height: 60px;
+        --primary-dark: #1a2a3a;
+        --primary-darker: #0d1520;
+        --accent-color: #4e73df;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+      }
+      
+      .admin-main {
+        margin-left: var(--sidebar-width);
+        padding-top: var(--header-height);
+        min-height: 100vh;
+      }
+      
+      @media (max-width: 992px) {
+        .admin-sidebar {
+          transform: translateX(-100%);
+        }
+        
+        .admin-sidebar.show {
+          transform: translateX(0);
+        }
+        
+        .admin-main {
+          margin-left: 0;
+        }
+      }
+    </style>

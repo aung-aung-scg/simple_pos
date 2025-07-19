@@ -1,47 +1,40 @@
-<div class="d-flex flex-column p-3 bg-light sidebar" style="width: 250px; min-height: 100vh;">
-  <h3 class="text-center mb-4">Admin Panel</h3>
-  <ul class="nav flex-column">
-    <!-- Dashboard -->
-    <li class="nav-item">
-      <%= link_to admin_root_path, class: "nav-link d-flex align-items-center" do %>
-        <i class="fa fa-tachometer-alt me-2"></i> <!-- Dashboard icon -->
-        Dashboard
-      <% end %>
-    </li>
-
-    <!-- Products -->
-    <li class="nav-item">
-      <%= link_to admin_products_path, class: "nav-link d-flex align-items-center" do %>
-        <i class="fa fa-cogs me-2"></i> <!-- Products icon -->
-        Products
-      <% end %>
-    </li>
-
-    <!-- Users -->
-    <li class="nav-item">
-      <%= link_to admin_users_path, class: "nav-link d-flex align-items-center" do %>
-        <i class="fa fa-users me-2"></i> <!-- Users icon -->
-        Users
-      <% end %>
-    </li>
-
-    <!-- Orders -->
-    <li class="nav-item">
-      <%= link_to admin_orders_path, class: "nav-link d-flex align-items-center" do %>
-        <i class="fa fa-box me-2"></i> <!-- Orders icon -->
-        Orders
-      <% end %>
-    </li>
-
-    <!-- Logout -->
-    <li class="nav-item">
-      <%= link_to destroy_user_session_path,
-                  method: :delete,
-                  data: { turbo_method: :delete },
-                  class: "nav-link text-danger d-flex align-items-center" do %>
-        <i class="fa fa-sign-out-alt me-2"></i>
-        Logout
-      <% end %>
-    </li>
-  </ul>
-</div>
+<aside class="admin-sidebar position-fixed" id="adminSidebar" style="width: var(--sidebar-width); background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.05); top: var(--header-height); left: 0; height: calc(100vh - var(--header-height)); overflow-y: auto; transition: all 0.3s; z-index: 100;">
+  <div class="p-3">
+    <ul class="nav flex-column">
+      <li class="nav-item mb-2">
+        <%= link_to admin_root_path, class: "nav-link sidebar-link d-flex align-items-center #{'active' if current_page?(admin_root_path)}", style: "border-radius: 4px; transition: all 0.2s; color: #495057;" do %>
+          <i class="bi bi-speedometer2 me-3"></i>
+          Dashboard
+        <% end %>
+      </li>
+      
+      <li class="nav-item mb-2">
+        <%= link_to admin_products_path, class: "nav-link sidebar-link d-flex align-items-center #{'active' if current_page?(admin_products_path)}", style: "border-radius: 4px; transition: all 0.2s; color: #495057;" do %>
+          <i class="bi bi-box-seam me-3"></i>
+          Products
+        <% end %>
+      </li>
+      
+      <li class="nav-item mb-2">
+        <%= link_to admin_categories_path, class: "nav-link sidebar-link d-flex align-items-center #{'active' if current_page?(admin_categories_path)}", style: "border-radius: 4px; transition: all 0.2s; color: #495057;" do %>
+          <i class="bi bi-tags me-3"></i>
+          Categories
+        <% end %>
+      </li>
+      
+      <li class="nav-item mb-2">
+        <%= link_to admin_orders_path, class: "nav-link sidebar-link d-flex align-items-center #{'active' if current_page?(admin_orders_path)}", style: "border-radius: 4px; transition: all 0.2s; color: #495057;" do %>
+          <i class="bi bi-receipt me-3"></i>
+          Orders
+        <% end %>
+      </li>
+      
+      <li class="nav-item mb-2">
+        <%= link_to admin_users_path, class: "nav-link sidebar-link d-flex align-items-center #{'active' if current_page?(admin_users_path)}", style: "border-radius: 4px; transition: all 0.2s; color: #495057;" do %>
+          <i class="bi bi-people me-3"></i>
+          Users
+        <% end %>
+      </li>
+    </ul>
+  </div>
+</aside>

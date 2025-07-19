@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   helper_method :admin?
+  before_action :configure_permitted_parameters, if: :devise_controller?
 
   def admin?
     current_user&.admin?
@@ -31,5 +32,12 @@ class ApplicationController < ActionController::Base
         )
       }
     end
+  end
+
+  protected
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :phone, :address])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:name, :phone, :address])
   end
 end
