@@ -1,10 +1,29 @@
 <%= form_with(model: [:admin, @user], local: true, html: { class: "needs-validation", novalidate: true }) do |form| %>
   <div class="card shadow-lg border-0">
     <div class="card-header bg-primary text-white">
-      <h4 class="mb-0">New User</h4>
+      <h4 class="mb-0"><%= @user.new_record? ? "New User" : "Edit User" %></h4>
     </div>
     <div class="card-body">
 
+      <div class="row mb-4">
+        <label class="col-sm-3 col-form-label text-end">Profile Image</label>
+        <div class="col-sm-9">
+          <%= form.file_field :profile_image, class: "form-control mb-2" %>
+          
+          <% if @user.profile_image.attached? %>
+            <div class="d-flex align-items-center mt-2">
+              <%= image_tag @user.profile_image.variant(resize_to_limit: [100, 100]), 
+                          class: "rounded-circle me-3", 
+                          style: "width: 100px; height: 100px; object-fit: cover;" %>
+              <div class="form-check">
+                <%= form.check_box :remove_profile_image, class: "form-check-input" %>
+                <%= form.label :remove_profile_image, "Remove current image", class: "form-check-label" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+       
       <!-- Name -->
       <div class="row mb-3">
         <label class="col-sm-3 col-form-label text-end"><%= form.label :name %></label>
@@ -21,6 +40,23 @@
         </div>
       </div>
 
+      <!-- Phone Number -->
+      <div class="row mb-3">
+        <label class="col-sm-3 col-form-label text-end"><%= form.label :phone %></label>
+        <div class="col-sm-9">
+          <%= form.telephone_field :phone, class: "form-control", pattern: '\d{2}-\d{7,}', title: "Format: 09-12345678" %>
+          <small class="form-text text-muted">Format: 0912345</small>
+        </div>
+      </div>
+
+      <!-- Address (now as textarea) -->
+      <div class="row mb-3">
+        <label class="col-sm-3 col-form-label text-end"><%= form.label :address %></label>
+        <div class="col-sm-9">
+          <%= form.text_area :address, class: "form-control", rows: 3 %>
+        </div>
+      </div>
+
       <!-- Role -->
       <div class="row mb-3">
         <label class="col-sm-3 col-form-label text-end"><%= form.label :role %></label>
@@ -33,7 +69,10 @@
       <div class="row mb-3">
         <label class="col-sm-3 col-form-label text-end"><%= form.label :password %></label>
         <div class="col-sm-9">
-          <%= form.password_field :password, class: "form-control", required: true %>
+          <%= form.password_field :password, class: "form-control", required: @user.new_record? %>
+          <% unless @user.new_record? %>
+            <small class="form-text text-muted">Leave blank if you don't want to change it</small>
+          <% end %>
         </div>
       </div>
 
@@ -41,7 +80,7 @@
       <div class="row mb-3">
         <label class="col-sm-3 col-form-label text-end"><%= form.label :password_confirmation %></label>
         <div class="col-sm-9">
-          <%= form.password_field :password_confirmation, class: "form-control", required: true %>
+          <%= form.password_field :password_confirmation, class: "form-control", required: @user.new_record? %>
         </div>
       </div>
 

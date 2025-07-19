@@ -3,6 +3,7 @@
 # Table name: orders
 #
 #  id          :integer          not null, primary key
+#  status      :string           default("pending")
 #  total_price :decimal(, )
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null

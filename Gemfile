@@ -61,6 +61,7 @@ group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
   gem 'annotate'
+  gem 'letter_opener_web'
 end
 
 group :test do
@@ -78,3 +79,4 @@ gem 'pry-rails'
 gem 'image_processing', '~> 1.2'
 gem 'devise'
 gem 'font-awesome-sass', '~> 6.0'
+gem 'kaminari'

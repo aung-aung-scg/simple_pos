@@ -1,8 +1,76 @@
-<h1>User Details</h1>
-
-<p><strong>Name:</strong> <%= @user.name %></p>
-<p><strong>Email:</strong> <%= @user.email %></p>
-<p><strong>Role:</strong> <%= @user.role %></p>
-
-<%= link_to "Edit", edit_admin_user_path(@user), class: "btn btn-warning" %>
-<%= link_to "Back", admin_users_path, class: "btn btn-secondary" %>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">User Details</h2>
+            <span class="badge bg-light text-dark fs-6"><%= @user.role.titleize %></span>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-md-4 text-center">
+             <% if @user.profile_image.attached? %>
+                <%= image_tag @user.profile_image.variant(resize_to_limit: [200, 200]), 
+                            class: "rounded-circle img-thumbnail mb-3", 
+                            style: "width: 200px; height: 200px; object-fit: cover;" %>
+              <% else %>
+                <div class="avatar-placeholder bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+                    style="width: 200px; height: 200px;">
+                  <i class="fas fa-user fa-4x text-secondary"></i>
+                </div>
+              <% end %>
+            </div>
+            <div class="col-md-8">
+              <h3 class="mb-3"><%= @user.name %></h3>
+              
+              <div class="list-group list-group-flush">
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <strong>Email:</strong>
+                    <span><%= @user.email %></span>
+                  </div>
+                </div>
+                
+                <% if @user.phone.present? %>
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <strong>Phone:</strong>
+                    <span><%= @user.formatted_phone || @user.phone %></span>
+                  </div>
+                </div>
+                <% end %>
+                
+                <% if @user.address.present? %>
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <strong>Address:</strong>
+                    <span class="text-end"><%= simple_format(@user.address) %></span>
+                  </div>
+                </div>
+                <% end %>
+                
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between">
+                    <strong>Member Since:</strong>
+                    <span><%= @user.created_at.to_formatted_s(:long) %></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-footer bg-light">
+          <div class="d-flex justify-content-between">
+            <%= link_to admin_users_path, class: "btn btn-secondary" do %>
+              <i class="fas fa-arrow-left me-2"></i> Back to Users
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

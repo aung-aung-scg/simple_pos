@@ -1,9 +1,17 @@
-import "jquery"
+// app/javascript/application.js
+import jquery from "jquery"
 import * as bootstrap from "bootstrap"
-import "@hotwired/turbo-rails"
 
-// Initialize Bootstrap tooltips AFTER Turbo loads
+window.$ = window.jQuery = jquery;
+
 document.addEventListener("turbo:load", () => {
-  const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el))
+  // Tooltips
+  const tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    .map(el => new bootstrap.Tooltip(el))
+  
+  // Auto-dismiss alerts
+  const alerts = [].slice.call(document.querySelectorAll('.alert'))
+    .map(el => {
+      setTimeout(() => new bootstrap.Alert(el).close(), 5000)
+    })
 })

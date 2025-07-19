@@ -1,9 +1,14 @@
 <% if object && object.errors.any? %>
-  <div id="error_explanation" class="alert alert-danger" data-turbo-cache="false">
-    <h4 class="alert-heading">
-      <%= t("errors.messages.not_saved", count: object.errors.count, resource: object.model_name.human.downcase) %>
-    </h4>
-    <ul class="mb-0">
+  <div id="error_explanation" class="alert alert-danger alert-dismissible fade show" data-turbo-cache="false">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="alert-heading mb-0">
+        <%= t("errors.messages.not_saved", 
+              count: object.errors.count, 
+              resource: object.model_name.human.downcase) %>
+      </h4>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <ul class="mb-0 mt-2 ps-3">
       <% object.errors.full_messages.each do |message| %>
         <li><%= message %></li>
       <% end %>

@@ -96,3 +96,49 @@
   .table-hover tbody tr:hover {
     background-color: rgba(0,0,0,0.02);
   }
+
+  .is-invalid {
+    border-color: #dc3545;
+  }
+
+  .alert {
+    border-radius: 0.5rem;
+  }
+
+  /* Add this to your existing style section */
+  th a {
+    color: inherit;
+    transition: all 0.2s ease;
+  }
+
+  th a:hover {
+    color: var(--bs-primary);
+  }
+
+  .fa-sort, .fa-sort-up, .fa-sort-down {
+    font-size: 0.8em;
+    margin-left: 4px;
+  }
+
+  /* Sorting indicators */
+.sort-indicators {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1;
+}
+
+.sort-indicators .fa-sort {
+  opacity: 0.5;
+  font-size: 0.8em;
+}
+
+.sort-indicators .fa-sort-up,
+.sort-indicators .fa-sort-down {
+  font-size: 0.8em;
+}
+
+th a:hover .sort-indicators .fa-sort {
+  opacity: 0.8;
+  color: var(--bs-primary);
+}

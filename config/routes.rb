@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 
@@ -35,7 +39,12 @@ Rails.application.routes.draw do
 
     resources :products
     resources :users
-    resources :orders, only: [:index, :show]
+    resources :orders do
+      member do
+        patch :update_status
+      end
+    end
+    resources :categories
 
     resource :profile, only: [] do
       get 'edit'

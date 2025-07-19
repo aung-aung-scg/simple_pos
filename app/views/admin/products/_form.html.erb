@@ -1,4 +1,14 @@
 <%= form_with(model: [:admin, @product], local: true, html: { class: "needs-validation", novalidate: true, enctype: "multipart/form-data" }) do |form| %>
+  <% if @product.errors.any? %>
+    <div class="alert alert-danger">
+      <h5><%= pluralize(@product.errors.count, "error") %> prohibited this product from being saved:</h5>
+      <ul>
+        <% @product.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
   <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="page-title">
@@ -36,6 +46,42 @@
               <%= form.label :description, class: "form-label fw-bold" %>
               <%= form.text_area :description, rows: 4, class: 'form-control', placeholder: "Enter product description" %>
             </div>
+
+            <div class="mb-3">
+              <%= form.label :category_id, "Category", class: "form-label fw-bold" %>
+              <%= form.collection_select :category_id, Category.where.not(parent_id: nil), :id, :name,
+                    { prompt: "Select Subcategory" },
+                    { class: "form-select form-select-lg", required: true } %>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :gender, class: "form-label fw-bold" %>
+              <%= form.select :gender, options_for_select([["Men", "men"], ["Women", "women"], ["Kids", "kid"]], @product.gender),
+                    { prompt: "Select Gender" },
+                    class: "form-select form-select-lg", required: true %>
+            </div>
+
+           <div class="mb-3">
+            <%= form.label :image, "Main Product Image", class: "form-label fw-bold d-block mb-2" %>
+            <div class="file-upload-area border rounded p-3 text-center position-relative">
+              <% if @product.image.attached? %>
+                <%= image_tag @product.image.variant(:thumb), class: "img-thumbnail mb-2" %>
+              <% end %>
+              <div class="image-preview-container"></div>
+              <label for="main-image-upload" class="btn btn-secondary mb-0">
+                <i class="fas fa-cloud-upload-alt me-2"></i>
+                <%= @product.image.attached? ? 'Change Image' : 'Upload Image' %>
+              </label>
+              <%= form.file_field :image, class: 'd-none', id: 'main-image-upload' %>
+              <small class="text-muted d-block mt-2">JPEG or PNG, max 5MB</small>
+              <% if @product.image.attached? %>
+                <div class="form-check mt-2">
+                  <%= form.check_box :remove_image, class: "form-check-input" %>
+                  <%= form.label :remove_image, "Remove current image", class: "form-check-label" %>
+                </div>
+              <% end %>
+            </div>
+          </div>
           </div>
         </div>
 
@@ -187,3 +233,25 @@
     padding: 1.5rem;
   }
 </style>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Image preview for main product image
+    const mainImageUpload = document.getElementById('main-image-upload');
+    if (mainImageUpload) {
+      mainImageUpload.addEventListener('change', function(e) {
+        const container = this.closest('.file-upload-area');
+        const previewContainer = container.querySelector('.image-preview-container');
+        const file = e.target.files[0];
+        
+        if (file) {
+          previewContainer.innerHTML = '';
+          const preview = document.createElement('img');
+          preview.src = URL.createObjectURL(file);
+          preview.className = 'img-thumbnail mt-2';
+          preview.style.maxHeight = '150px';
+          previewContainer.appendChild(preview);
+        }
+      });
+    }
+  });
+</script>

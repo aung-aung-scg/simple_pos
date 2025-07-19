@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_28_132913) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_11_145727) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,6 +39,14 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_28_132913) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "parent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_categories_on_parent_id"
+  end
+
   create_table "order_items", force: :cascade do |t|
     t.integer "order_id", null: false
     t.integer "product_id", null: false
@@ -46,6 +54,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_28_132913) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "product_variant_id", null: false
+    t.decimal "unit_price"
     t.index ["order_id"], name: "index_order_items_on_order_id"
     t.index ["product_id"], name: "index_order_items_on_product_id"
     t.index ["product_variant_id"], name: "index_order_items_on_product_variant_id"
@@ -56,6 +65,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_28_132913) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.string "status", default: "pending"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -76,6 +86,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_28_132913) do
     t.datetime "updated_at", null: false
     t.integer "stock", default: 0, null: false
     t.text "description"
+    t.string "gender"
+    t.integer "category_id"
+    t.index ["category_id"], name: "index_products_on_category_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -89,6 +102,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_28_132913) do
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
+    t.string "phone"
+    t.text "address"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
@@ -100,4 +115,5 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_28_132913) do
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "users"
   add_foreign_key "product_variants", "products"
+  add_foreign_key "products", "categories"
 end

@@ -1,23 +1,43 @@
-<h1>Order #<%= @order.id %></h1>
-<p><strong>Date:</strong> <%= @order.created_at.strftime("%Y-%m-%d %H:%M") %></p>
+<h1>Order ID: <%= @order.id.to_s.rjust(13, '0') %></h1>
+<p><strong>Date:</strong> <%= @order.created_at.strftime("%B %d, %Y %I:%M %p") %></p>
 <p><strong>Total:</strong> MMK <%= number_with_delimiter(@order.total_price) %></p>
 
 <h3 class="mt-4">Items</h3>
-<table class="table">
-  <thead>
+<table class="table table-bordered align-middle">
+  <thead class="table-light text-uppercase">
     <tr>
       <th>Product</th>
-      <th>Quantity</th>
-      <th>Price (MMK)</th>
+      <th>Variant</th>
+      <th class="text-center">Quantity</th>
+      <th class="text-end">Unit Price (MMK)</th>
+      <th class="text-end">Subtotal (MMK)</th>
     </tr>
   </thead>
   <tbody>
     <% @order.order_items.each do |item| %>
       <tr>
-        <td><%= item.product.name %></td>
-        <td><%= item.quantity %></td>
-        <td><%= number_with_delimiter(item.product.price * item.quantity) %></td>
+        <td class="d-flex align-items-center">
+          <% if item.product_variant.image.attached? %>
+            <%= image_tag item.product_variant.image.variant(resize_to_limit: [60, 60]), class: "me-3 rounded" %>
+          <% else %>
+            <div style="width:60px; height:60px; background:#eee;" class="me-3 rounded"></div>
+          <% end %>
+          <span><%= item.product.name %></span>
+        </td>
+        <td>
+          Color: <%= item.product_variant.color %><br>
+          Size: <%= item.product_variant.size %>
+        </td>
+        <td class="text-center"><%= item.quantity %></td>
+        <td class="text-end"><%= number_with_delimiter(item.product.price) %></td>
+        <td class="text-end"><%= number_with_delimiter(item.product.price * item.quantity) %></td>
       </tr>
     <% end %>
   </tbody>
+  <tfoot>
+    <tr>
+      <th colspan="4" class="text-end">Total</th>
+      <th class="text-end">MMK <%= number_with_delimiter(@order.total_price) %></th>
+    </tr>
+  </tfoot>
 </table>

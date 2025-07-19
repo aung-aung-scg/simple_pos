@@ -1,4 +1,14 @@
-<h2 class="text-center mb-5 display-5 fw-bold"><%= @product.name %></h2>
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-4">
+  <ol class="breadcrumb text-uppercase small">
+    <li class="breadcrumb-item text-muted"><%= @product.gender %></li>
+    <li class="breadcrumb-item text-muted"><%= @product.category&.name %></li>
+    <li class="breadcrumb-item active text-dark" aria-current="page"><%= @product.name %></li>
+  </ol>
+</nav>
+
+<!-- Product Name -->
+<h1 class="h4 fw-bold mb-3 text-uppercase"><%= @product.name %></h1>
 
 <div class="row gy-5 align-items-start">
   <!-- Product Image -->
@@ -14,19 +24,25 @@
 
   <!-- Product Options -->
   <div class="col-lg-6">
+    <!-- Price -->
     <div class="mb-4">
-      <span class="fs-6 text-muted">Price</span>
-      <p class="fs-2 fw-bold text-primary mb-0">MMK <%= number_with_delimiter(@product.price) %></p>
+      <span class="fs-6 text-muted text-uppercase">Price</span>
+      <p class="fs-2 fw-bold text-dark mb-0">MMK <%= number_with_delimiter(@product.price) %></p>
     </div>
 
     <%= form_with url: add_to_cart_pos_path, method: :post, local: true, id: "variant-selection-form" do %>
-    <!-- Color Selection -->
+      <!-- Color Selection -->
       <div class="mb-4">
-        <label class="form-label fw-semibold">Choose Color</label>
+        <label class="form-label fw-semibold text-uppercase">Color</label>
         <div id="color-options" class="d-flex flex-wrap gap-2">
           <% @available_colors.each do |color| %>
+            <% variant_with_image = @variants.find { |v| v.color == color && v.image.attached? } %>
+            <% image_url = variant_with_image&.image_url || "https://via.placeholder.com/60" %>
+
             <input type="radio" name="color" id="color-<%= color %>" value="<%= color %>" class="btn-check color-radio" autocomplete="off">
-            <label class="btn btn-dark" for="color-<%= color %>"><%= color.titleize %></label>
+            <label for="color-<%= color %>" class="border rounded p-1" style="cursor: pointer;">
+              <%= image_tag image_url, style: "width: 60px; height: 60px; object-fit: cover; border-radius: 0.25rem;" %>
+            </label>
           <% end %>
         </div>
         <div class="invalid-feedback d-block text-danger" id="color-error" style="display: none;">Please select a color.</div>
@@ -34,8 +50,8 @@
 
       <!-- Size Selection -->
       <div class="mb-4">
-        <label class="form-label fw-semibold">Choose Size</label>
-        <div id="size-options" class="d-flex flex-wrap gap-2"></div>
+        <label class="form-label fw-semibold text-uppercase">Size</label>
+        <div id="size-options" class="d-grid gap-2 grid-template-columns" style="grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));"></div>
         <div class="invalid-feedback d-block text-danger" id="size-error" style="display: none;">Please select a size.</div>
       </div>
 
@@ -44,133 +60,137 @@
 
       <%= hidden_field_tag :variant_id, nil, id: "variant-id-field" %>
 
-      <button type="submit" class="btn btn-lg btn-primary w-100" disabled id="add-to-cart-btn">
-        <i class="bi bi-cart-plus me-2"></i> Add to Cart
+      <!-- Add to Cart -->
+      <button type="submit" class="btn btn-dark btn-lg w-100 text-uppercase" id="add-to-cart-btn" disabled>
+        Add to Card
       </button>
     <% end %>
   </div>
 </div>
+
+<!-- jQuery Script -->
 <script>
-  let variants = <%= raw @variants.to_json(only: [:id, :color, :size, :stock], methods: [:image_url]) %>;
+  $(document).ready(function() {
+    const variants = <%= raw @variants.to_json(only: [:id, :color, :size, :stock], methods: [:image_url]) %>;
 
-  function updateSizes(color) {
-    const sizeContainer = document.getElementById('size-options');
-    sizeContainer.innerHTML = '';
-
-    const filtered = variants.filter(v => v.color === color);
-    const uniqueSizes = [...new Set(filtered.map(v => v.size))];
-
-    uniqueSizes.forEach(size => {
-      const input = document.createElement('input');
-      input.type = 'radio';
-      input.name = 'size';
-      input.id = `size-${size}`;
-      input.className = 'btn-check size-radio';
-      input.value = size;
-      input.autocomplete = 'off';
-
-      const label = document.createElement('label');
-      label.className = 'btn btn-primary';
-      label.htmlFor = `size-${size}`;
-      label.textContent = size;
-
-      sizeContainer.appendChild(input);
-      sizeContainer.appendChild(label);
-    });
-
-    clearSelection();
-
-    const firstImage = filtered.find(v => v.image_url);
-    if (firstImage) {
-      document.getElementById('variant-image').src = firstImage.image_url;
+    function clearSelection() {
+      $('#stock-info').text('');
+      $('#variant-id-field').val('');
+      $('#add-to-cart-btn').prop('disabled', true);
     }
 
-    // Add event listeners for new size radios
-    document.querySelectorAll('.size-radio').forEach(radio => {
-      radio.addEventListener('change', e => {
-        const selectedColor = document.querySelector('.color-radio:checked')?.value;
+    function updateSizes(color) {
+      const filtered = variants.filter(v => v.color === color);
+      const uniqueSizes = [...new Set(filtered.map(v => v.size))];
+      const $sizeContainer = $('#size-options');
+
+      $sizeContainer.empty();
+
+      uniqueSizes.forEach(size => {
+        const inputId = `size-${size}`;
+        const $input = $(`<input>`, {
+          type: 'radio',
+          name: 'size',
+          id: inputId,
+          class: 'btn-check size-radio',
+          value: size,
+          autocomplete: 'off'
+        });
+
+        const $label = $('<label>', {
+          class: 'btn btn-dark',
+          for: inputId,
+          text: size
+        });
+
+        $sizeContainer.append($input, $label);
+      });
+
+      clearSelection();
+
+      const firstImageVariant = filtered.find(v => v.image_url);
+      if (firstImageVariant) {
+        $('#variant-image').attr('src', firstImageVariant.image_url);
+      }
+
+      // Attach event listener to new size radios
+      $('.size-radio').on('change', function() {
+        const selectedSize = $(this).val();
+        const selectedColor = $('.color-radio:checked').val();
         if (selectedColor) {
-          updateStock(selectedColor, e.target.value);
-          document.getElementById('size-error').style.display = 'none';
+          updateStock(selectedColor, selectedSize);
+          $('#size-error').hide();
         }
       });
-    });
-  }
+    }
 
-  function clearSelection() {
-    document.getElementById('stock-info').textContent = "";
-    document.getElementById('variant-id-field').value = "";
-    document.getElementById('add-to-cart-btn').disabled = true;
-  }
+    function updateStock(color, size) {
+      const variant = variants.find(v => v.color === color && v.size === size);
+      const $variantImage = $('#variant-image');
 
-  function updateStock(color, size) {
-    const variant = variants.find(v => v.color === color && v.size === size);
-    const variantImage = document.getElementById('variant-image');
+      if (variant) {
+        $('#stock-info').text(`Stock: ${variant.stock}`);
+        $('#variant-id-field').val(variant.id);
+        $('#add-to-cart-btn').prop('disabled', variant.stock <= 0);
 
-    if (variant) {
-      document.getElementById('stock-info').textContent = `Stock: ${variant.stock}`;
-      document.getElementById('variant-id-field').value = variant.id;
-      document.getElementById('add-to-cart-btn').disabled = variant.stock <= 0;
-
-      if (variant.image_url) {
-        variantImage.src = variant.image_url;
+        if (variant.image_url) {
+          $variantImage.attr('src', variant.image_url);
+        }
+      } else {
+        $('#stock-info').text('Variant not available');
+        $('#variant-id-field').val('');
+        $('#add-to-cart-btn').prop('disabled', true);
       }
-    } else {
-      document.getElementById('stock-info').textContent = "Variant not available";
-      document.getElementById('variant-id-field').value = "";
-      document.getElementById('add-to-cart-btn').disabled = true;
     }
-  }
 
-  document.querySelectorAll('.color-radio').forEach(radio => {
-    radio.addEventListener('change', e => {
-      updateSizes(e.target.value);
-      document.getElementById('color-error').style.display = 'none';
+    $('.color-radio').on('change', function() {
+      const color = $(this).val();
+      updateSizes(color);
+      $('#color-error').hide();
     });
-  });
 
-  // Bootstrap-like validation
-  document.getElementById('variant-selection-form').addEventListener('submit', function (e) {
-    const selectedColor = document.querySelector('.color-radio:checked');
-    const selectedSize = document.querySelector('.size-radio:checked');
+    $('#variant-selection-form').on('submit', function(e) {
+      const selectedColor = $('.color-radio:checked').length > 0;
+      const selectedSize = $('.size-radio:checked').length > 0;
+      let valid = true;
 
-    let valid = true;
+      if (!selectedColor) {
+        $('#color-error').show();
+        valid = false;
+      }
+      if (!selectedSize) {
+        $('#size-error').show();
+        valid = false;
+      }
 
-    if (!selectedColor) {
-      document.getElementById('color-error').style.display = 'block';
-      valid = false;
-    }
-
-    if (!selectedSize) {
-      document.getElementById('size-error').style.display = 'block';
-      valid = false;
-    }
-
-    if (!valid) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+      if (!valid) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
   });
 </script>
+
+<!-- CSS -->
 <style>
-  .color-swatch {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 500;
+  .grid-template-columns input[type="radio"] + label {
+    display: inline-block;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 0.25rem;
+  }
+
+  .grid-template-columns input[type="radio"].btn-check:checked + label {
+    border: 2px solid #000;
+    background-color: #1c510fff;
+  }
+
+  .breadcrumb {
+    background: transparent;
     padding: 0;
-    text-transform: capitalize;
-  }
-
-  .btn-check:checked + .color-swatch {
-    border: 3px solid #000;
-  }
-
-  .btn-check:checked + .color-swatch {
-    border: 3px solid #333;
+    margin-bottom: 1rem;
   }
 </style>

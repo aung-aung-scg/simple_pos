@@ -1,27 +1,178 @@
-<h1 class="mb-4 text-center">Products</h1>
+<section class="mb-4 py-3">
+  <div class="container">
+    <% category_images = {
+      "men" => "categories/men.jpg",
+      "women" => "categories/women.jpg",
+      "kid" => "categories/kid.jpg"
+    } %>
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
-  <% @products.each do |product| %>
-    <% first_variant = product.product_variants.first %>
-    <div class="col">
-      <div class="card h-100 shadow-sm">
-        <%= link_to url_for(controller: :pos, action: :show, id: product.id), class: "text-decoration-none text-dark" do %>
-          <% if first_variant&.image&.attached? %>
-            <%= image_tag first_variant.image.variant(resize_to_limit: [150, 150]), class: "card-img-top mx-auto d-block pt-3", alt: product.name, style: "width:150px; height:150px; object-fit: contain;" %>
+    <div class="row row-cols-2 row-cols-md-3 g-3">
+      <% [["Men", "men"], ["Women", "women"], ["Kids", "kid"]].each do |label, value| %>
+        <div class="col">
+          <% if category_images.key?(value) %>
+            <%= link_to pos_path(gender: value, category: value), class: "text-decoration-none text-dark category-card" do %>
+              <div class="card h-100 border-0 overflow-hidden shadow-sm">
+                <div class="position-relative">
+                  <%= image_tag category_images[value], alt: "#{label} category", class: "card-img-top", style: "aspect-ratio: 1 / 1; object-fit: cover; height: 160px;" %>
+                  <div class="category-overlay"></div>
+                </div>
+                <div class="card-body text-center p-2">
+                  <h5 class="card-title fw-bold mb-0 fs-5"><%= label %></h5>
+                  <span class="text-muted small">Shop Now <i class="bi bi-arrow-right ms-1"></i></span>
+                </div>
+              </div>
+            <% end %>
           <% else %>
-            <%= image_tag "https://via.placeholder.com/150?text=No+Image", class: "card-img-top mx-auto d-block pt-3", alt: "No image available", style: "width:150px; height:150px; object-fit: contain;" %>
+            <div class="card h-100 border-0 shadow-sm text-center">
+              <div class="card-body d-flex flex-column justify-content-center align-items-center" style="min-height: 160px;">
+                <h5 class="card-title fw-semibold mb-1 text-muted fs-5"><%= label %></h5>
+                <p class="text-muted small">Coming Soon</p>
+              </div>
+            </div>
           <% end %>
-          <div class="card-body d-flex flex-column justify-content-between">
-            <h5 class="card-title text-center"><%= product.name %></h5>
-            <p class="card-text text-center text-primary fs-5 fw-bold">MMK <%= product.price %></p>
-            <% if first_variant&.stock.to_i > 0 %>
-              <span class="badge bg-success text-center d-block">In Stock</span>
-            <% else %>
-              <span class="badge bg-danger text-center d-block">Sold Out</span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- 🛍️ Product Listing -->
+<section class="py-4">
+  <div class="container">
+     <div class="container">
+    <% if params[:gender] || params[:category] %>
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb text-uppercase small">
+          <li class="breadcrumb-item">
+            <%= link_to "Home", pos_path, class: "text-muted text-decoration-none" %>
+          </li>
+          <% if params[:gender] %>
+            <li class="breadcrumb-item text-muted">
+              <%= params[:gender].capitalize %>
+            </li>
+          <% end %>
+          <% if params[:category] %>
+            <li class="breadcrumb-item text-muted">
+              <%= params[:category].capitalize %>
+            </li>
+          <% end %>
+          <li class="breadcrumb-item active text-dark" aria-current="page">
+            Featured Products
+          </li>
+        </ol>
+      </nav>
+    <% end %>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+      <% @products.each do |product| %>
+        <% first_variant = product.product_variants.first %>
+        <div class="col">
+          <div class="card h-100 shadow-sm border-0 product-card">
+            <%= link_to url_for(controller: :pos, action: :show, id: product.id), class: "text-decoration-none text-dark h-100 d-flex flex-column" do %>
+              <div class="product-image-container p-3">
+                <% if first_variant&.image&.attached? %>
+                  <%= image_tag first_variant.image.variant(resize_to_limit: [300, 300]), class: "card-img-top img-fluid mx-auto d-block", alt: product.name, style: "object-fit: contain; height: 180px; width: auto; max-width: 100%;" %>
+                <% else %>
+                  <%= image_tag "https://via.placeholder.com/300x300?text=No+Image", class: "card-img-top img-fluid mx-auto d-block", style: "object-fit: contain; height: 180px; width: auto; max-width: 100%;" %>
+                <% end %>
+              </div>
+              <div class="card-body pt-0 pb-3 px-3 text-center d-flex flex-column">
+                <h5 class="card-title mb-2 fs-6 fw-semibold text-truncate"><%= product.name %></h5>
+                <p class="fs-5 fw-bold text-primary mb-2">MMK <%= number_with_delimiter(product.price) %></p>
+                <% total_stock = product.product_variants.sum(:stock) %>
+                <% if total_stock > 0 %>
+                  <% if total_stock <= 5 %>
+                    <span class="badge bg-warning bg-opacity-10 text-warning mb-2">
+                      Only <%= total_stock %> left!
+                    </span>
+                  <% elsif total_stock <= 20 %>
+                    <span class="badge bg-info bg-opacity-10 text-info mb-2">
+                      Low Stock
+                    </span>
+                  <% else %>
+                    <span class="badge bg-success bg-opacity-10 text-success mb-2">
+                      In Stock
+                    </span>
+                  <% end %>
+                <% else %>
+                  <span class="badge bg-danger bg-opacity-10 text-danger mb-2">
+                    Sold Out
+                  </span>
+                <% end %>
+                <button class="btn btn-primary btn-sm mt-auto">View Details</button>
+              </div>
             <% end %>
           </div>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
     </div>
-  <% end %>
-</div>
+  </div>
+</section>
+
+<style>
+  .category-card {
+    transition: transform 0.2s ease;
+  }
+  
+  .category-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  .category-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.2), rgba(0,0,0,0.05));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .category-card:hover .category-overlay {
+    opacity: 1;
+  }
+  
+  .shadow-sm {
+    box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+  }
+
+  
+  .shadow-hover {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .shadow-hover:hover {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  }
+  
+  /* Product Cards */
+  .product-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+  
+  .product-image-container {
+    background-color: #f8f9fa;
+    transition: background-color 0.3s ease;
+  }
+  
+  .product-card:hover .product-image-container {
+    background-color: #f1f3f5;
+  }
+  
+  /* General Improvements */
+  .rounded-4 {
+    border-radius: 1rem !important;
+  }
+  
+  .bg-light {
+    background-color: #f8f9fa !important;
+  }
+</style>
