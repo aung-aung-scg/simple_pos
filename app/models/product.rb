@@ -40,11 +40,9 @@ class Product < ApplicationRecord
                     greater_than_or_equal_to: 0
                   }, if: -> { product_variants.empty? }
   validates :description, length: { maximum: 1000 }, allow_blank: true
-  validates :gender, inclusion: { in: %w[men women kid],
-                        message: "%{value} is not a valid gender" },
-                     allow_blank: true
-  validate :acceptable_image
   validate :stock_consistency
+  validate :validate_image_type
+  validate :validate_image_size
 
   # Scopes
   scope :in_stock, -> { where(stock: 1..) }
@@ -62,15 +60,21 @@ class Product < ApplicationRecord
 
   private
 
-  def acceptable_image
+  def validate_image_type
     return unless image.attached?
 
-    unless image.content_type.in?(%w[image/jpeg image/png])
-      errors.add(:image, 'must be a JPEG or PNG')
+    unless image.content_type.in?(%w[image/jpeg image/png image/jpg])
+      errors.add(:image, 'must be a JPEG or PNG image')
+      image.purge
     end
+  end
+
+  def validate_image_size
+    return unless image.attached?
 
     if image.byte_size > 5.megabytes
-      errors.add(:image, 'is too large (max 5MB)')
+      errors.add(:image, 'should be less than 5MB')
+      image.purge # Remove the invalid attachment
     end
   end
 

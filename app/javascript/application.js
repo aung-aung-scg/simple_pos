@@ -3,7 +3,7 @@
 import "jquery"
 import "bootstrap"
 import "@hotwired/turbo-rails"
-import "./controllers" // this loads Stimulus controllers
+import "./controllers"
 
 // ✅ Make jQuery globally available
 window.$ = window.jQuery = $;

@@ -44,7 +44,11 @@ Rails.application.routes.draw do
         patch :update_status
       end
     end
-    resources :categories
+    resources :categories do
+      collection do
+        get :subcategories
+      end
+    end
 
     resource :profile, only: [] do
       get 'edit'

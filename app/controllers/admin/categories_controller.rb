@@ -3,7 +3,8 @@ class Admin::CategoriesController < ApplicationController
   layout "admin"
 
   def index
-    @categories = Category.left_joins(:products)
+    @categories = Category.where(parent_id: nil)
+                        .left_joins(:products)
                         .select('categories.*, COUNT(products.id) as products_count')
                         .group('categories.id')
                         .order("#{sort_column} #{sort_direction}")
@@ -13,8 +14,19 @@ class Admin::CategoriesController < ApplicationController
   def show
   end
 
+  def subcategories
+    if params[:gender].present?
+      parent = Category.main_categories.find_by(name: params[:gender])
+      @categories = parent ? parent.subcategories : []
+    else
+      @categories = []
+    end
+
+    render json: @categories
+  end
+
   def new
-    @category = Category.new
+    @category = Category.new(parent_id: params[:parent_id])
     load_parent_categories
   end
 

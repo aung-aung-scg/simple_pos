@@ -1,4 +1,9 @@
-<%= form_with(model: [:admin, @product], local: true, html: { class: "needs-validation", novalidate: true, enctype: "multipart/form-data" }) do |form| %>
+<%= form_with(model: [:admin, @product], local: true, html: {
+  class: "needs-validation",
+  novalidate: true,
+  enctype: "multipart/form-data",
+  data: { controller: "product-form" }
+}) do |form| %>
   <% if @product.errors.any? %>
     <div class="alert alert-danger">
       <h5><%= pluralize(@product.errors.count, "error") %> prohibited this product from being saved:</h5>
@@ -9,6 +14,7 @@
       </ul>
     </div>
   <% end %>
+
   <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="page-title">
@@ -48,44 +54,82 @@
             </div>
 
             <div class="mb-3">
-              <%= form.label :category_id, "Category", class: "form-label fw-bold" %>
-              <%= form.collection_select :category_id, Category.where.not(parent_id: nil), :id, :name,
-                    { prompt: "Select Subcategory" },
-                    { class: "form-select form-select-lg", required: true } %>
+              <%= form.label :gender, "Gender Category", class: "form-label fw-bold" %>
+              <%= form.select :gender,
+                    options_for_select(
+                      Category.main_categories.pluck(:name, :name),
+                      @product.category&.parent&.name || @product.gender
+                    ),
+                    { prompt: "Select Gender Category" },
+                    {
+                      class: "form-select form-select-lg",
+                      required: true,
+                      id: "gender-category-select",
+                      data: {
+                        action: "change->product-form#loadSubcategories"
+                      }
+                    } %>
             </div>
 
             <div class="mb-3">
-              <%= form.label :gender, class: "form-label fw-bold" %>
-              <%= form.select :gender, options_for_select([["Men", "men"], ["Women", "women"], ["Kids", "kid"]], @product.gender),
-                    { prompt: "Select Gender" },
-                    class: "form-select form-select-lg", required: true %>
+              <%= form.label :category_id, "Subcategory", class: "form-label fw-bold" %>
+              <%= form.select :category_id,
+                    options_for_select(
+                      @product.category ? [[@product.category.name, @product.category.id]] : [],
+                      @product.category_id
+                    ),
+                    { prompt: "Select Subcategory" },
+                    {
+                      class: "form-select form-select-lg",
+                      required: true,
+                      id: "subcategory-select",
+                      data: { product_form_target: "subcategorySelect" },
+                      disabled: @product.category_id.blank? && @product.gender.blank?
+                    } %>
             </div>
 
-           <div class="mb-3">
-            <%= form.label :image, "Main Product Image", class: "form-label fw-bold d-block mb-2" %>
-            <div class="file-upload-area border rounded p-3 text-center position-relative">
-              <% if @product.image.attached? %>
-                <%= image_tag @product.image.variant(:thumb), class: "img-thumbnail mb-2" %>
-              <% end %>
-              <div class="image-preview-container"></div>
-              <label for="main-image-upload" class="btn btn-secondary mb-0">
-                <i class="fas fa-cloud-upload-alt me-2"></i>
-                <%= @product.image.attached? ? 'Change Image' : 'Upload Image' %>
-              </label>
-              <%= form.file_field :image, class: 'd-none', id: 'main-image-upload' %>
-              <small class="text-muted d-block mt-2">JPEG or PNG, max 5MB</small>
-              <% if @product.image.attached? %>
-                <div class="form-check mt-2">
-                  <%= form.check_box :remove_image, class: "form-check-input" %>
-                  <%= form.label :remove_image, "Remove current image", class: "form-check-label" %>
-                </div>
-              <% end %>
+            <div class="mb-3">
+              <%= form.label :image, "Main Product Image", class: "form-label fw-bold d-block mb-2" %>
+              <div class="file-upload-area border rounded p-3 text-center position-relative <%= 'border-danger' if @product.errors[:image].any? %>">
+                <% if @product.image.attached? %>
+                  <%= image_tag @product.image.variant(:thumb), class: "img-thumbnail mb-2" %>
+                <% end %>
+                <div class="image-preview-container"></div>
+                <label for="main-image-upload" class="btn btn-secondary mb-0">
+                  <i class="fas fa-cloud-upload-alt me-2"></i>
+                  <%= @product.image.attached? ? 'Change Image' : 'Upload Image' %>
+                </label>
+                <%= form.file_field :image,
+                      class: 'd-none',
+                      id: 'main-image-upload',
+                      accept: 'image/png,image/jpeg,image/jpg',
+                      data: {
+                        product_form_target: "mainImageUpload",
+                        max_size: 5.megabytes
+                      } %>
+
+                <small class="text-muted d-block mt-2">JPEG or PNG, max 5MB</small>
+
+                <% if @product.errors[:image].any? %>
+                  <div class="invalid-feedback d-block text-danger">
+                    <% @product.errors[:image].each do |error| %>
+                      <div><i class="fas fa-exclamation-circle me-1"></i><%= error %></div>
+                    <% end %>
+                  </div>
+                <% end %>
+
+                <% if @product.image.attached? %>
+                  <div class="form-check mt-2">
+                    <%= form.check_box :remove_image, class: "form-check-input" %>
+                    <%= form.label :remove_image, "Remove current image", class: "form-check-label" %>
+                  </div>
+                <% end %>
+              </div>
             </div>
-          </div>
           </div>
         </div>
 
-        <!-- Variants Section -->
+        <!-- Variants -->
         <div class="card shadow-sm mb-4">
           <div class="card-header bg-light d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Product Variants</h5>
@@ -124,6 +168,10 @@
                             <%= variant_form.check_box :_destroy, class: "form-check-input", role: "switch" %>
                             <%= variant_form.label :_destroy, "Remove", class: "form-check-label small" %>
                           </div>
+                        <% else %>
+                          <button type="button" class="btn btn-danger btn-sm remove-variant">
+                            <i class="bi bi-trash"></i>
+                          </button>
                         <% end %>
                       </div>
                     </div>
@@ -135,7 +183,7 @@
         </div>
       </div>
 
-      <!-- Sidebar for Actions/Status -->
+      <!-- Sidebar -->
       <div class="col-lg-4">
         <div class="card shadow-sm sticky-top" style="top: 20px;">
           <div class="card-header bg-light">
@@ -146,14 +194,14 @@
               <%= form.submit @product.new_record? ? 'Create Product' : 'Update Product', class: 'btn btn-primary' %>
               <%= link_to "Cancel", admin_products_path, class: "btn btn-secondary" %>
             </div>
-            
+
             <% unless @product.new_record? %>
               <hr>
               <div class="d-grid">
-                <%= link_to "Delete Product", admin_product_path(@product), 
-                    method: :delete, 
-                    data: { confirm: "Are you sure you want to delete this product?" },
-                    class: "btn btn-danger" %>
+                <%= link_to "Delete Product", admin_product_path(@product),
+                      method: :delete,
+                      data: { confirm: "Are you sure you want to delete this product?" },
+                      class: "btn btn-danger" %>
               </div>
             <% end %>
           </div>
@@ -162,128 +210,3 @@
     </div>
   </div>
 <% end %>
-
-<%= javascript_tag do %>
-  // Wrap in Turbo load event for proper timing
-  document.addEventListener("turbo:load", () => {
-    let variantIndex = <%= @product.product_variants.size %>;
-
-    const addVariantBtn = document.getElementById("add-variant-btn");
-    if (addVariantBtn) {
-      addVariantBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        const wrapper = document.createElement("div");
-        wrapper.classList.add("variant-card", "card", "mb-3");
-        wrapper.innerHTML = `
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-3">
-                <label class="form-label small fw-bold">Color</label>
-                <input type="text"
-                       name="product[product_variants_attributes][${variantIndex}][color]"
-                       class="form-control"
-                       required
-                       placeholder="e.g. Black">
-              </div>
-              <div class="col-md-3">
-                <label class="form-label small fw-bold">Size</label>
-                <input type="text"
-                       name="product[product_variants_attributes][${variantIndex}][size]"
-                       class="form-control"
-                       required
-                       placeholder="e.g. M, XL">
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small fw-bold">Stock</label>
-                <input type="number"
-                       name="product[product_variants_attributes][${variantIndex}][stock]"
-                       class="form-control"
-                       required
-                       placeholder="0">
-              </div>
-              <div class="col-md-3">
-                <label class="form-label small fw-bold">Image</label>
-                <input type="file"
-                       name="product[product_variants_attributes][${variantIndex}][image]"
-                       class="form-control">
-              </div>
-              <div class="col-md-1 d-flex align-items-end">
-                <button type="button" class="btn btn-danger btn-sm remove-variant">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-
-        // Add remove functionality
-        wrapper.querySelector(".remove-variant").addEventListener("click", () => {
-          wrapper.remove();
-        });
-
-        document.getElementById("variants").appendChild(wrapper);
-        variantIndex++;
-      });
-    }
-
-    // Add event delegation for remove buttons (works for dynamically added elements)
-    document.addEventListener("click", (e) => {
-      if (e.target.closest(".remove-variant")) {
-        e.preventDefault();
-        e.target.closest(".variant-card").remove();
-      }
-    });
-  });
-<% end %>
-
-<style>
-  .page-title {
-    font-size: 1.75rem;
-    color: #2c3e50;
-  }
-  
-  .variant-card {
-    border-left: 3px solid #4e73df;
-    transition: all 0.2s;
-  }
-  
-  .variant-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
-  }
-  
-  .form-control-lg {
-    padding: 0.75rem 1rem;
-    font-size: 1.05rem;
-  }
-  
-  .card-header {
-    padding: 1rem 1.5rem;
-  }
-  
-  .card-body {
-    padding: 1.5rem;
-  }
-</style>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // Image preview for main product image
-    const mainImageUpload = document.getElementById('main-image-upload');
-    if (mainImageUpload) {
-      mainImageUpload.addEventListener('change', function(e) {
-        const container = this.closest('.file-upload-area');
-        const previewContainer = container.querySelector('.image-preview-container');
-        const file = e.target.files[0];
-        
-        if (file) {
-          previewContainer.innerHTML = '';
-          const preview = document.createElement('img');
-          preview.src = URL.createObjectURL(file);
-          preview.className = 'img-thumbnail mt-2';
-          preview.style.maxHeight = '150px';
-          previewContainer.appendChild(preview);
-        }
-      });
-    }
-  });
-</script>
