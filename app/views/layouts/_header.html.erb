@@ -14,15 +14,20 @@
         <% if current_user %>
           <!-- Cart Link (always visible for non-admins) -->
           <% unless current_user.admin? %>
-            <li class="nav-item me-3">
-              <%= link_to pos_cart_path, class: "nav-link position-relative" do %>
-                <i class="bi bi-cart3 fs-5 me-1"></i>
-                <span>Cart</span>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                  <%= (session[:cart] || {}).values.sum %>
-                </span>
-              <% end %>
-            </li>
+           <li class="nav-item me-3">
+            <%= link_to pos_cart_path, class: "nav-link position-relative p-2 text-nowrap" do %>
+              <div class="d-flex align-items-center position-relative">
+                <i class="bi bi-cart3 fs-4"></i>
+                <span class="ms-2 d-none d-lg-inline">Cart</span>
+                <% count = Array(session[:cart]).sum { |_,v| v.to_i } %>
+                <% if count > 0 %>
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="transform: translate(10%, -50%);">
+                    <%= count %>
+                  </span>
+                <% end %>
+              </div>
+            <% end %>
+          </li>
           <% end %>
 
           <!-- Orders Link (moved out of dropdown) -->

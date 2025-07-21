@@ -1,34 +1,25 @@
 // app/javascript/application.js
-import "jquery";
-import "bootstrap";  // This now includes Popper internally
 
-// Initialize jQuery globally if needed
-window.$ = window.jQuery = jQuery;
+import "jquery"
+import "bootstrap"
+import "@hotwired/turbo-rails"
+import "./controllers" // this loads Stimulus controllers
 
-// Initialize Bootstrap components
-const initBootstrap = () => {
-  // Tooltips
-  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
-    new bootstrap.Tooltip(el);
+// ✅ Make jQuery globally available
+window.$ = window.jQuery = $;
+
+// Confirm it's working
+console.log("✅ jQuery initialized:", $);
+
+// Optional: Bootstrap auto-dismiss alerts and tooltips
+$(document).on("turbo:load", function () {
+  $('[data-bs-toggle="tooltip"]').each(function () {
+    new bootstrap.Tooltip(this);
   });
-  
-  // Auto-dismiss alerts
-  document.querySelectorAll('.alert').forEach(el => {
+
+  $('.alert').each(function () {
     setTimeout(() => {
-      const alert = bootstrap.Alert.getOrCreateInstance(el);
-      alert.close();
+      bootstrap.Alert.getOrCreateInstance(this).close();
     }, 5000);
-  });
-};
-
-// Initialize for both Turbo and regular page loads
-document.addEventListener("turbo:load", initBootstrap);
-document.addEventListener("DOMContentLoaded", initBootstrap);
-
-// Cleanup before Turbo cache
-document.addEventListener("turbo:before-cache", () => {
-  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
-    const tooltip = bootstrap.Tooltip.getInstance(el);
-    if (tooltip) tooltip.dispose();
   });
 });
