@@ -1,24 +1,52 @@
-# README
+# Clover Queen Clothing
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A modern admin dashboard for managing e-commerce operations, built with Ruby on Rails, Bootstrap 5, and Hotwire.
 
-Things you may want to cover:
+## Features
 
-* Ruby version
+- User management with role-based access control
+- Product catalog with variants
+- Order processing system
+- Category management
+- Responsive design with mobile support
+- Image uploads with Active Storage
+- Sorting and pagination
 
-* System dependencies
+## Requirements
 
-* Configuration
+- Ruby 3.3.0
+- Rails 7.1.3
+- PostgreSQL 14+
+- Node.js 16+
+- Yarn 1.22+
 
-* Database creation
+## Installation
 
-* Database initialization
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/clover-queen-admin.git
+   cd clover-queen-admin
 
-* How to run the test suite
+2. Install dependencies:
+    bundle install
+    yarn install
 
-* Services (job queues, cache servers, search engines, etc.)
+3. Set up database:
+    rails db:create
+    rails db:migrate
+    rails db:seed
+4. Install ImageMagick:
+    # Ubuntu/Debian
+    sudo apt-get install imagemagick libvips
 
-* Deployment instructions
+    # macOS
+    brew install imagemagick vips
+5. Running the App
+    rails s 
+    Access at: http://localhost:3000
 
-* ...
+    Default admin login:
+
+        Email: admin@example.com
+
+        Password: password

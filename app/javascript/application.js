@@ -1,17 +1,34 @@
 // app/javascript/application.js
-import jquery from "jquery"
-import * as bootstrap from "bootstrap"
+import "jquery";
+import "bootstrap";  // This now includes Popper internally
 
-window.$ = window.jQuery = jquery;
+// Initialize jQuery globally if needed
+window.$ = window.jQuery = jQuery;
 
-document.addEventListener("turbo:load", () => {
+// Initialize Bootstrap components
+const initBootstrap = () => {
   // Tooltips
-  const tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    .map(el => new bootstrap.Tooltip(el))
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    new bootstrap.Tooltip(el);
+  });
   
   // Auto-dismiss alerts
-  const alerts = [].slice.call(document.querySelectorAll('.alert'))
-    .map(el => {
-      setTimeout(() => new bootstrap.Alert(el).close(), 5000)
-    })
-})
+  document.querySelectorAll('.alert').forEach(el => {
+    setTimeout(() => {
+      const alert = bootstrap.Alert.getOrCreateInstance(el);
+      alert.close();
+    }, 5000);
+  });
+};
+
+// Initialize for both Turbo and regular page loads
+document.addEventListener("turbo:load", initBootstrap);
+document.addEventListener("DOMContentLoaded", initBootstrap);
+
+// Cleanup before Turbo cache
+document.addEventListener("turbo:before-cache", () => {
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    const tooltip = bootstrap.Tooltip.getInstance(el);
+    if (tooltip) tooltip.dispose();
+  });
+});
