@@ -164,42 +164,74 @@
 <% end %>
 
 <%= javascript_tag do %>
-  document.addEventListener("DOMContentLoaded", () => {
+  // Wrap in Turbo load event for proper timing
+  document.addEventListener("turbo:load", () => {
     let variantIndex = <%= @product.product_variants.size %>;
 
-    document.getElementById("add-variant-btn").addEventListener("click", () => {
-      const wrapper = document.createElement("div");
-      wrapper.classList.add("variant-card", "card", "mb-3");
-      
-      wrapper.innerHTML = `
-        <div class="card-body">
-          <div class="row g-3">
-            <div class="col-md-3">
-              <label class="form-label small fw-bold">Color</label>
-              <input type="text" name="product[product_variants_attributes][${variantIndex}][color]" 
-                     class="form-control" required placeholder="e.g. Black">
-            </div>
-            <div class="col-md-3">
-              <label class="form-label small fw-bold">Size</label>
-              <input type="text" name="product[product_variants_attributes][${variantIndex}][size]" 
-                     class="form-control" required placeholder="e.g. M, XL">
-            </div>
-            <div class="col-md-2">
-              <label class="form-label small fw-bold">Stock</label>
-              <input type="number" name="product[product_variants_attributes][${variantIndex}][stock]" 
-                     class="form-control" required placeholder="0">
-            </div>
-            <div class="col-md-3">
-              <label class="form-label small fw-bold">Image</label>
-              <input type="file" name="product[product_variants_attributes][${variantIndex}][image]" 
-                     class="form-control">
+    const addVariantBtn = document.getElementById("add-variant-btn");
+    if (addVariantBtn) {
+      addVariantBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("variant-card", "card", "mb-3");
+        wrapper.innerHTML = `
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label small fw-bold">Color</label>
+                <input type="text"
+                       name="product[product_variants_attributes][${variantIndex}][color]"
+                       class="form-control"
+                       required
+                       placeholder="e.g. Black">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-bold">Size</label>
+                <input type="text"
+                       name="product[product_variants_attributes][${variantIndex}][size]"
+                       class="form-control"
+                       required
+                       placeholder="e.g. M, XL">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-bold">Stock</label>
+                <input type="number"
+                       name="product[product_variants_attributes][${variantIndex}][stock]"
+                       class="form-control"
+                       required
+                       placeholder="0">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-bold">Image</label>
+                <input type="file"
+                       name="product[product_variants_attributes][${variantIndex}][image]"
+                       class="form-control">
+              </div>
+              <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-danger btn-sm remove-variant">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      `;
-      
-      document.getElementById("variants").appendChild(wrapper);
-      variantIndex++;
+        `;
+
+        // Add remove functionality
+        wrapper.querySelector(".remove-variant").addEventListener("click", () => {
+          wrapper.remove();
+        });
+
+        document.getElementById("variants").appendChild(wrapper);
+        variantIndex++;
+      });
+    }
+
+    // Add event delegation for remove buttons (works for dynamically added elements)
+    document.addEventListener("click", (e) => {
+      if (e.target.closest(".remove-variant")) {
+        e.preventDefault();
+        e.target.closest(".variant-card").remove();
+      }
     });
   });
 <% end %>
