@@ -1,17 +1,25 @@
 // app/javascript/application.js
-import jquery from "jquery"
-import * as bootstrap from "bootstrap"
 
-window.$ = window.jQuery = jquery;
+import "jquery"
+import "bootstrap"
+import "@hotwired/turbo-rails"
+import "./controllers"
 
-document.addEventListener("turbo:load", () => {
-  // Tooltips
-  const tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    .map(el => new bootstrap.Tooltip(el))
-  
-  // Auto-dismiss alerts
-  const alerts = [].slice.call(document.querySelectorAll('.alert'))
-    .map(el => {
-      setTimeout(() => new bootstrap.Alert(el).close(), 5000)
-    })
-})
+// ✅ Make jQuery globally available
+window.$ = window.jQuery = $;
+
+// Confirm it's working
+console.log("✅ jQuery initialized:", $);
+
+// Optional: Bootstrap auto-dismiss alerts and tooltips
+$(document).on("turbo:load", function () {
+  $('[data-bs-toggle="tooltip"]').each(function () {
+    new bootstrap.Tooltip(this);
+  });
+
+  $('.alert').each(function () {
+    setTimeout(() => {
+      bootstrap.Alert.getOrCreateInstance(this).close();
+    }, 5000);
+  });
+});

@@ -1,7 +1,7 @@
 <div class="container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="page-title">
-      <i class="bi bi-tags me-2"></i>Categories Management
+      <i class="bi bi-tags me-2"></i>Main Categories
     </h1>
     <%= link_to new_admin_category_path, class: 'btn btn-primary' do %>
       <i class="fas fa-plus me-1"></i> New Category
@@ -16,7 +16,6 @@
             <tr>
               <th style="width: 60px;" class="ps-4"><%= sortable "id", "ID" %></th>
               <th><%= sortable "name", "Name" %></th>
-              <th>Parent</th>
               <th class="text-end"><%= sortable "products_count", "Products" %></th>
               <th>Subcategories</th>
               <th class="text-end pe-4" style="width: 120px;">Actions</th>
@@ -31,23 +30,14 @@
                     <div class="fw-semibold"><%= category.name %></div>
                   </div>
                 </td>
-                <td>
-                  <% if category.parent %>
-                    <span class="badge bg-light text-dark border"><%= category.parent.name %></span>
-                  <% else %>
-                    <span class="text-muted">None</span>
-                  <% end %>
-                </td>
                 <td class="text-end">
-                  <span class="badge bg-primary"><%= category.products.count %></span>
+                  <span class="badge bg-primary"><%= category.products_count %></span>
                 </td>
                 <td>
                   <% if category.subcategories.any? %>
-                    <div class="d-flex flex-wrap gap-1" style="max-width: 300px;">
-                      <% category.subcategories.each do |sub| %>
-                        <span class="badge bg-light text-dark border"><%= sub.name %></span>
-                      <% end %>
-                    </div>
+                    <span class="badge bg-light text-dark border">
+                      <%= pluralize(category.subcategories.count, 'subcategory') %>
+                    </span>
                   <% else %>
                     <span class="text-muted">None</span>
                   <% end %>
@@ -97,29 +87,3 @@
     </div>
   <% end %>
 </div>
-
-<style>
-  .page-title {
-    font-size: 1.75rem;
-    color: #2c3e50;
-  }
-  
-  .table-hover tbody tr {
-    transition: all 0.2s ease;
-  }
-  
-  .table-hover tbody tr:hover {
-    background-color: rgba(var(--bs-primary-rgb), 0.03);
-    transform: translateY(-1px);
-  }
-</style>
-
-<script>
-  // Initialize tooltips
-  document.addEventListener('DOMContentLoaded', function() {
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-  })
-</script>

@@ -1,0 +1,38 @@
+.file-upload-area {
+  background-color: #f8f9fa;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.file-upload-area:hover {
+  background-color: #e9ecef;
+}
+
+.file-upload-area.border-danger {
+  border-color: #dc3545 !important;
+  background-color: rgba(220, 53, 69, 0.05);
+}
+
+.page-title {
+  font-size: 1.75rem;
+  color: #2c3e50;
+}
+
+.variant-card {
+  border-left: 3px solid #4e73df;
+  transition: all 0.2s ease-in-out;
+}
+
+.variant-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+}
+
+.form-control-lg {
+  padding: 0.75rem 1rem;
+  font-size: 1.05rem;
+}
+
+.invalid-feedback {
+  font-size: 0.875em;
+  color: #dc3545;
+}
