@@ -2,11 +2,34 @@ class PosController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @products = Product.includes(:product_variants).all
-    @products = do_search(@products)
-    @products = do_filter(@products)
-    @products = do_sort(@products)
-    @products = @products.page(params[:page]).per(10)
+    # Base query with eager loading
+    @products = Product.includes(:product_variants, :category)
+
+    # Apply category filters
+    if params[:category].present?
+      category = Category.find_by(id: params[:category])
+
+      if category.present?
+        if category.parent_id.nil?
+          # Main category selected (Men/Women/Kids)
+          @products = @products.where(gender: category.name.downcase)
+          @subcategories = category.subcategories
+        else
+          # Subcategory selected
+          @products = @products.where(category_id: category.id)
+          @subcategories = category.parent.subcategories
+        end
+      end
+    end
+
+    # Apply additional filters
+    @products = @products
+      .then { |relation| filter_by_price(relation) }
+      .then { |relation| filter_by_stock(relation) }
+      .then { |relation| search_products(relation) }
+      .then { |relation| sort_products(relation) }
+      .page(params[:page]).per(12)
+
     @cart = session[:cart] || {}
   end
 
@@ -104,25 +127,41 @@ class PosController < ApplicationController
     products
   end
 
-  def do_filter(products)
-    # Filter by gender if given
-    products = products.where(gender: params[:gender]) if params[:gender].present?
-
-    # Filter by category name if given
-    if params[:category].present?
-      category = Category.find_by(name: params[:category])
-      products = products.where(category_id: category.id) if category
+  def filter_by_price(products)
+    case params[:price]
+    when 'under_10k' then products.where('price < ?', 10_000)
+    when '10k_30k'   then products.where(price: 10_000..30_000)
+    when '30k_50k'   then products.where(price: 30_000..50_000)
+    when 'over_50k'  then products.where('price > ?', 50_000)
+    else products
     end
+  end
 
-    # Filter by stock status
+  def filter_by_stock(products)
     case params[:stock]
-    when "in_stock"
-      products = products.joins(:product_variants).where("product_variants.stock > 0").distinct
-    when "sold_out"
-      products = products.joins(:product_variants).where("product_variants.stock <= 0").distinct
+    when 'in_stock'  then products.joins(:product_variants).where('product_variants.stock > 0').distinct
+    when 'low_stock' then products.joins(:product_variants).where('product_variants.stock BETWEEN 1 AND 20').distinct
+    when 'sold_out'  then products.joins(:product_variants).where('product_variants.stock <= 0').distinct
+    else products
     end
+  end
 
-    products
+  def search_products(products)
+    if params[:query].present?
+      products.where("products.name ILIKE :query OR products.description ILIKE :query", query: "%#{params[:query]}%")
+    else
+      products
+    end
+  end
+
+  def sort_products(products)
+    case params[:sort]
+    when 'newest'       then products.order(created_at: :desc)
+    when 'price_asc'    then products.order(price: :asc)
+    when 'price_desc'   then products.order(price: :desc)
+    when 'best_selling' then products.left_joins(:order_items).group(:id).order('COUNT(order_items.id) DESC')
+    else products.order(created_at: :desc) # Default sorting
+    end
   end
 
   def do_sort(products)
