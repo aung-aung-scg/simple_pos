@@ -52,7 +52,7 @@ class PosController < ApplicationController
     variant_id = params[:variant_id].to_s
     session[:cart][variant_id] ||= 0
     session[:cart][variant_id] += 1
-    redirect_to pos_cart_path, notice: "Added one item."
+    redirect_to cart_pos_path, notice: "Added one item."
   end
 
   def remove_from_cart
@@ -76,8 +76,31 @@ class PosController < ApplicationController
     redirect_to pos_cart_path
   end
 
+  def prepare_checkout
+    if session[:cart].blank?
+      redirect_to pos_cart_path, alert: "Your cart is empty"
+    else
+      redirect_to confirm_order_pos_path
+    end
+  end
+
+  def confirm_order
+    @cart = session[:cart] || {}
+    @variants = ProductVariant.where(id: @cart.keys).includes(:product)
+    @total = calculate_cart_total
+    respond_to do |format|
+      format.html { render :confirm_order, status: :ok }
+    end
+  end
+
   def checkout
     @cart = session[:cart] || {}
+    unless current_user.phone.present? && current_user.address.present?
+      redirect_to edit_user_path(current_user),
+                  alert: "Please complete your phone number and address before checkout"
+      return
+    end
+
     ActiveRecord::Base.transaction do
       order = Order.create!(total_price: 0, user: current_user)
       total = 0
@@ -112,10 +135,10 @@ class PosController < ApplicationController
 
       # Clear cart after successful checkout
       session[:cart] = {}
+      redirect_to pos_path, notice: "Order ##{order.id} created successfully!"
     end
-    redirect_to pos_path, notice: "Order created successfully!"
-  rescue ActiveRecord::RecordInvalid, ActiveRecord::Rollback => e
-    redirect_to pos_cart_path, alert: "Order creation failed: #{e.message}"
+  rescue => e
+    redirect_to cart_pos_path, alert: "Checkout failed: #{e.message}"
   end
 
   private
@@ -168,5 +191,14 @@ class PosController < ApplicationController
     sort_key = params[:sort_key].presence_in(Product.column_names + ['price']) || 'created_at'
     sort_order = params[:sort_order].in?(%w[asc desc]) ? params[:sort_order] : 'desc'
     products.order("#{sort_key} #{sort_order}")
+  end
+
+  def calculate_cart_total
+    total = 0
+    @cart.each do |variant_id, quantity|
+      variant = ProductVariant.find(variant_id)
+      total += variant.product.price * quantity
+    end
+    total
   end
 end

@@ -70,122 +70,157 @@
 
 <!-- jQuery Script -->
 <script>
-  $(document).ready(function() {
-    const variants = <%= raw @variants.to_json(only: [:id, :color, :size, :stock], methods: [:image_url]) %>;
+// Robust initialization that works with both Turbo and traditional loads
+function initializeVariantSelection() {
+  // Check if jQuery is available
+  if (typeof jQuery === 'undefined') {
+    console.log('jQuery not loaded yet, will retry...');
+    setTimeout(initializeVariantSelection, 100);
+    return;
+  }
 
-    function clearSelection() {
-      $('#stock-info').text('');
+  // Check if required elements exist
+  if ($('#color-options').length === 0) {
+    console.log('Variant elements not found, skipping initialization');
+    return;
+  }
+
+  const variants = <%= raw @variants.to_json(only: [:id, :color, :size, :stock], methods: [:image_url]) %>;
+
+  function clearSelection() {
+    $('#stock-info').text('');
+    $('#variant-id-field').val('');
+    $('#add-to-cart-btn').prop('disabled', true);
+  }
+
+  function updateSizes(color, autoSelectFirst = false) {
+    const filtered = variants.filter(v => v.color === color);
+    const uniqueSizes = [...new Set(filtered.map(v => v.size))];
+    const $sizeContainer = $('#size-options');
+
+    $sizeContainer.empty();
+
+    uniqueSizes.forEach(size => {
+      const inputId = `size-${size}`;
+      $sizeContainer.append(`
+        <input type="radio" name="size" id="${inputId}" class="btn-check size-radio" value="${size}" autocomplete="off">
+        <label class="btn btn-outline-secondary" for="${inputId}">${size}</label>
+      `);
+    });
+
+    clearSelection();
+
+    const firstImageVariant = filtered.find(v => v.image_url);
+    if (firstImageVariant) {
+      $('#variant-image').attr('src', firstImageVariant.image_url);
+    }
+
+    if (autoSelectFirst && uniqueSizes.length > 0) {
+      $(`#size-${uniqueSizes[0]}`).prop('checked', true).trigger('change');
+    }
+
+    // Use event delegation for dynamically added elements
+    $sizeContainer.off('change', '.size-radio').on('change', '.size-radio', function() {
+      const selectedSize = $(this).val();
+      const selectedColor = $('.color-radio:checked').val();
+      if (selectedColor) {
+        updateStock(selectedColor, selectedSize);
+        $('#size-error').hide();
+      }
+    });
+  }
+
+  function updateStock(color, size) {
+    const variant = variants.find(v => v.color === color && v.size === size);
+    if (variant) {
+      $('#stock-info').text(`Stock: ${variant.stock}`);
+      $('#variant-id-field').val(variant.id);
+      $('#add-to-cart-btn').prop('disabled', variant.stock <= 0);
+      
+      if (variant.image_url) {
+        $('#variant-image').attr('src', variant.image_url);
+      }
+    } else {
+      $('#stock-info').text('Variant not available');
       $('#variant-id-field').val('');
       $('#add-to-cart-btn').prop('disabled', true);
     }
+  }
 
-    function updateSizes(color) {
-      const filtered = variants.filter(v => v.color === color);
-      const uniqueSizes = [...new Set(filtered.map(v => v.size))];
-      const $sizeContainer = $('#size-options');
-
-      $sizeContainer.empty();
-
-      uniqueSizes.forEach(size => {
-        const inputId = `size-${size}`;
-        const $input = $(`<input>`, {
-          type: 'radio',
-          name: 'size',
-          id: inputId,
-          class: 'btn-check size-radio',
-          value: size,
-          autocomplete: 'off'
-        });
-
-        const $label = $('<label>', {
-          class: 'btn btn-dark',
-          for: inputId,
-          text: size
-        });
-
-        $sizeContainer.append($input, $label);
-      });
-
-      clearSelection();
-
-      const firstImageVariant = filtered.find(v => v.image_url);
-      if (firstImageVariant) {
-        $('#variant-image').attr('src', firstImageVariant.image_url);
-      }
-
-      // Attach event listener to new size radios
-      $('.size-radio').on('change', function() {
-        const selectedSize = $(this).val();
-        const selectedColor = $('.color-radio:checked').val();
-        if (selectedColor) {
-          updateStock(selectedColor, selectedSize);
-          $('#size-error').hide();
-        }
-      });
-    }
-
-    function updateStock(color, size) {
-      const variant = variants.find(v => v.color === color && v.size === size);
-      const $variantImage = $('#variant-image');
-
-      if (variant) {
-        $('#stock-info').text(`Stock: ${variant.stock}`);
-        $('#variant-id-field').val(variant.id);
-        $('#add-to-cart-btn').prop('disabled', variant.stock <= 0);
-
-        if (variant.image_url) {
-          $variantImage.attr('src', variant.image_url);
-        }
-      } else {
-        $('#stock-info').text('Variant not available');
-        $('#variant-id-field').val('');
-        $('#add-to-cart-btn').prop('disabled', true);
-      }
-    }
-
-    $('.color-radio').on('change', function() {
-      const color = $(this).val();
-      updateSizes(color);
-      $('#color-error').hide();
-    });
-
-    $('#variant-selection-form').on('submit', function(e) {
-      const selectedColor = $('.color-radio:checked').length > 0;
-      const selectedSize = $('.size-radio:checked').length > 0;
-      let valid = true;
-
-      if (!selectedColor) {
-        $('#color-error').show();
-        valid = false;
-      }
-      if (!selectedSize) {
-        $('#size-error').show();
-        valid = false;
-      }
-
-      if (!valid) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    });
+  // Initialize color selection
+  $('.color-radio').off('change').on('change', function() {
+    const color = $(this).val();
+    updateSizes(color, true);
+    $('#color-error').hide();
   });
+
+  // Initialize form validation
+  $('#variant-selection-form').off('submit').on('submit', function(e) {
+    const selectedColor = $('.color-radio:checked').length > 0;
+    const selectedSize = $('.size-radio:checked').length > 0;
+    
+    if (!selectedColor) $('#color-error').show();
+    if (!selectedSize) $('#size-error').show();
+    
+    if (!selectedColor || !selectedSize) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+
+  // Auto-select first variant
+  if (variants.length > 0) {
+    const firstColor = variants[0].color;
+    $(`.color-radio[value="${firstColor}"]`).prop('checked', true).trigger('change');
+  }
+}
+
+// Initialize on both regular page load and Turbo visits
+document.addEventListener('turbo:load', initializeVariantSelection);
+document.addEventListener('DOMContentLoaded', initializeVariantSelection);
+
+// Initialize immediately if page already loaded
+if (document.readyState === 'complete') {
+  initializeVariantSelection();
+}
 </script>
 
 <!-- CSS -->
 <style>
+  .grid-template-columns {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  }
+
   .grid-template-columns input[type="radio"] + label {
     display: inline-block;
     text-align: center;
-    padding: 10px;
+    padding: 6px 0;
     border: 1px solid #ccc;
-    font-weight: bold;
+    border-radius: 999px;
+    background-color: #fff;
+    color: #333;
+    font-weight: 500;
     cursor: pointer;
-    border-radius: 0.25rem;
+    min-width: 50px;
+    transition: all 0.2s ease-in-out;
   }
+
 
   .grid-template-columns input[type="radio"].btn-check:checked + label {
     border: 2px solid #000;
-    background-color: #1c510fff;
+    background-color: #fff;
+    color: #000;
+  }
+  .color-radio + label {
+    border-radius: 4px;
+    overflow: hidden;
+    border: 2px solid transparent;
+  }
+
+  .color-radio:checked + label {
+    border-color: #000;
   }
 
   .breadcrumb {
