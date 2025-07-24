@@ -3,6 +3,8 @@
 # Table name: products
 #
 #  id          :integer          not null, primary key
+#  archived    :boolean          default(FALSE)
+#  archived_at :datetime
 #  description :text
 #  gender      :string
 #  name        :string
@@ -14,6 +16,7 @@
 #
 # Indexes
 #
+#  index_products_on_archived     (archived)
 #  index_products_on_category_id  (category_id)
 #
 # Foreign Keys
@@ -22,7 +25,7 @@
 #
 class Product < ApplicationRecord
   # Associations
-  has_many :order_items, dependent: :nullify
+  has_many :order_items, dependent: :restrict_with_error
   has_one_attached :image do |attachable|
     attachable.variant :thumb, resize_to_limit: [300, 300]
     attachable.variant :medium, resize_to_limit: [600, 600]
@@ -56,6 +59,10 @@ class Product < ApplicationRecord
 
   def main_image
     image.attached? ? image : product_variants.first&.image
+  end
+
+  def can_be_deleted?
+    order_items.none?
   end
 
   private

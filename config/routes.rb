@@ -41,7 +41,13 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: 'dashboard#index'
 
-    resources :products
+    resources :products do
+      member do
+        patch :archive
+        patch :restore
+      end
+    end
+
     resources :users
     resources :orders do
       member do

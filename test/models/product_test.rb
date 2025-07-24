@@ -3,6 +3,8 @@
 # Table name: products
 #
 #  id          :integer          not null, primary key
+#  archived    :boolean          default(FALSE)
+#  archived_at :datetime
 #  description :text
 #  gender      :string
 #  name        :string
@@ -14,6 +16,7 @@
 #
 # Indexes
 #
+#  index_products_on_archived     (archived)
 #  index_products_on_category_id  (category_id)
 #
 # Foreign Keys
