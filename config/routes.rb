@@ -25,9 +25,13 @@ Rails.application.routes.draw do
 
   resources :pos, only: [:index, :show] do
     post :add_to_cart, on: :collection
+    collection do
+      get 'cart'
+      post 'prepare_checkout'
+      get 'confirm_order'
+      post 'checkout'
+    end
   end
-  get 'cart', to: 'pos#cart', as: :pos_cart
-  post 'checkout', to: 'pos#checkout', as: :checkout
   resources :orders, only: [:index, :show]
   post 'cart/add/:variant_id', to: 'pos#add_to_cart', as: :add_item_to_cart
   post 'cart/remove/:variant_id', to: 'pos#remove_from_cart', as: :remove_item_from_cart
@@ -37,7 +41,13 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: 'dashboard#index'
 
-    resources :products
+    resources :products do
+      member do
+        patch :archive
+        patch :restore
+      end
+    end
+
     resources :users
     resources :orders do
       member do

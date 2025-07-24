@@ -12,6 +12,41 @@
         <!-- Card Body -->
         <div class="card-body p-5">
           <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "needs-validation", novalidate: true }) do |f| %>
+            <!-- Name Field -->
+            <div class="mb-4 position-relative">
+              <%= f.label :name, class: "form-label fw-semibold" %>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-user text-muted"></i>
+                </span>
+                <%= f.text_field :name, class: "form-control py-3 ps-2 border-start-0 rounded-end", required: true, autocomplete: "name" %>
+                <div class="invalid-feedback"><%= t('errors.messages.blank') %></div>
+              </div>
+            </div>
+
+            <!-- Phone Field -->
+            <div class="mb-4 position-relative">
+              <%= f.label :phone, class: "form-label fw-semibold" %>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-phone text-muted"></i>
+                </span>
+                <%= f.text_field :phone, class: "form-control py-3 ps-2 border-start-0 rounded-end", required: true, autocomplete: "tel" %>
+                <div class="invalid-feedback"><%= t('errors.messages.blank') %></div>
+              </div>
+            </div>
+
+            <!-- Address Field -->
+            <div class="mb-4 position-relative">
+              <%= f.label :address, class: "form-label fw-semibold" %>
+              <div class="input-group has-validation">
+                <span class="input-group-text bg-light border-0 rounded-start">
+                  <i class="fas fa-map-marker-alt text-muted"></i>
+                </span>
+                <%= f.text_area :address, class: "form-control py-3 ps-2 border-start-0 rounded-end", rows: 3, required: true, autocomplete: "street-address" %>
+                <div class="invalid-feedback"><%= t('errors.messages.blank') %></div>
+              </div>
+            </div>
             <!-- Email Field -->
             <div class="mb-4 position-relative">
               <%= f.label :email, class: "form-label fw-semibold" %>

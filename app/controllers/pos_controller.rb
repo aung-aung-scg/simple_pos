@@ -2,11 +2,34 @@ class PosController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @products = Product.includes(:product_variants).all
-    @products = do_search(@products)
-    @products = do_filter(@products)
-    @products = do_sort(@products)
-    @products = @products.page(params[:page]).per(10)
+    # Base query with eager loading
+    @products = Product.includes(:product_variants, :category)
+
+    # Apply category filters
+    if params[:category].present?
+      category = Category.find_by(id: params[:category])
+
+      if category.present?
+        if category.parent_id.nil?
+          # Main category selected (Men/Women/Kids)
+          @products = @products.where(gender: category.name.downcase)
+          @subcategories = category.subcategories
+        else
+          # Subcategory selected
+          @products = @products.where(category_id: category.id)
+          @subcategories = category.parent.subcategories
+        end
+      end
+    end
+
+    # Apply additional filters
+    @products = @products
+      .then { |relation| filter_by_price(relation) }
+      .then { |relation| filter_by_stock(relation) }
+      .then { |relation| search_products(relation) }
+      .then { |relation| sort_products(relation) }
+      .page(params[:page]).per(12)
+
     @cart = session[:cart] || {}
   end
 
@@ -29,7 +52,7 @@ class PosController < ApplicationController
     variant_id = params[:variant_id].to_s
     session[:cart][variant_id] ||= 0
     session[:cart][variant_id] += 1
-    redirect_to pos_cart_path, notice: "Added one item."
+    redirect_to cart_pos_path, notice: "Added one item."
   end
 
   def remove_from_cart
@@ -53,8 +76,31 @@ class PosController < ApplicationController
     redirect_to pos_cart_path
   end
 
+  def prepare_checkout
+    if session[:cart].blank?
+      redirect_to pos_cart_path, alert: "Your cart is empty"
+    else
+      redirect_to confirm_order_pos_path
+    end
+  end
+
+  def confirm_order
+    @cart = session[:cart] || {}
+    @variants = ProductVariant.where(id: @cart.keys).includes(:product)
+    @total = calculate_cart_total
+    respond_to do |format|
+      format.html { render :confirm_order, status: :ok }
+    end
+  end
+
   def checkout
     @cart = session[:cart] || {}
+    unless current_user.phone.present? && current_user.address.present?
+      redirect_to edit_user_path(current_user),
+                  alert: "Please complete your phone number and address before checkout"
+      return
+    end
+
     ActiveRecord::Base.transaction do
       order = Order.create!(total_price: 0, user: current_user)
       total = 0
@@ -89,10 +135,10 @@ class PosController < ApplicationController
 
       # Clear cart after successful checkout
       session[:cart] = {}
+      redirect_to pos_path, notice: "Order ##{order.id} created successfully!"
     end
-    redirect_to pos_path, notice: "Order created successfully!"
-  rescue ActiveRecord::RecordInvalid, ActiveRecord::Rollback => e
-    redirect_to pos_cart_path, alert: "Order creation failed: #{e.message}"
+  rescue => e
+    redirect_to cart_pos_path, alert: "Checkout failed: #{e.message}"
   end
 
   private
@@ -104,30 +150,55 @@ class PosController < ApplicationController
     products
   end
 
-  def do_filter(products)
-    # Filter by gender if given
-    products = products.where(gender: params[:gender]) if params[:gender].present?
-
-    # Filter by category name if given
-    if params[:category].present?
-      category = Category.find_by(name: params[:category])
-      products = products.where(category_id: category.id) if category
+  def filter_by_price(products)
+    case params[:price]
+    when 'under_10k' then products.where('price < ?', 10_000)
+    when '10k_30k'   then products.where(price: 10_000..30_000)
+    when '30k_50k'   then products.where(price: 30_000..50_000)
+    when 'over_50k'  then products.where('price > ?', 50_000)
+    else products
     end
+  end
 
-    # Filter by stock status
+  def filter_by_stock(products)
     case params[:stock]
-    when "in_stock"
-      products = products.joins(:product_variants).where("product_variants.stock > 0").distinct
-    when "sold_out"
-      products = products.joins(:product_variants).where("product_variants.stock <= 0").distinct
+    when 'in_stock'  then products.joins(:product_variants).where('product_variants.stock > 0').distinct
+    when 'low_stock' then products.joins(:product_variants).where('product_variants.stock BETWEEN 1 AND 20').distinct
+    when 'sold_out'  then products.joins(:product_variants).where('product_variants.stock <= 0').distinct
+    else products
     end
+  end
 
-    products
+  def search_products(products)
+    if params[:query].present?
+      products.where("products.name ILIKE :query OR products.description ILIKE :query", query: "%#{params[:query]}%")
+    else
+      products
+    end
+  end
+
+  def sort_products(products)
+    case params[:sort]
+    when 'newest'       then products.order(created_at: :desc)
+    when 'price_asc'    then products.order(price: :asc)
+    when 'price_desc'   then products.order(price: :desc)
+    when 'best_selling' then products.left_joins(:order_items).group(:id).order('COUNT(order_items.id) DESC')
+    else products.order(created_at: :desc) # Default sorting
+    end
   end
 
   def do_sort(products)
     sort_key = params[:sort_key].presence_in(Product.column_names + ['price']) || 'created_at'
     sort_order = params[:sort_order].in?(%w[asc desc]) ? params[:sort_order] : 'desc'
     products.order("#{sort_key} #{sort_order}")
+  end
+
+  def calculate_cart_total
+    total = 0
+    @cart.each do |variant_id, quantity|
+      variant = ProductVariant.find(variant_id)
+      total += variant.product.price * quantity
+    end
+    total
   end
 end

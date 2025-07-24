@@ -14,7 +14,7 @@
         <% if current_user %>
           <% unless current_user.admin? %>
             <li class="nav-item me-3">
-              <%= link_to pos_cart_path, class: "nav-link position-relative p-2 text-nowrap" do %>
+              <%= link_to cart_pos_path, class: "nav-link position-relative p-2 text-nowrap" do %>
                 <div class="d-flex align-items-center position-relative">
                   <i class="bi bi-cart3 fs-4"></i>
                   <span class="ms-2 d-none d-lg-inline">Cart</span>

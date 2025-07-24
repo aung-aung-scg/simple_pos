@@ -45,10 +45,27 @@ class Admin::ProductsController < ApplicationController
   end
 
   def destroy
-    if @product.destroy
-      redirect_to admin_products_path, notice: "Product was successfully deleted."
+    @product = Product.find(params[:id])
+    if @product.can_be_deleted?
+      @product.destroy
+      redirect_to admin_products_path, notice: 'Product was successfully deleted.'
     else
-      redirect_to admin_products_path, alert: @product.errors.full_messages.to_sentence
+      redirect_to admin_products_path,
+                  alert: 'Cannot delete product - it has existing orders. Consider archiving instead.'
+    end
+  end
+
+  def archive
+    @product = Product.find(params[:id])
+    if @product.archived?
+      @product.update_columns(archived: false, archived_at: nil)
+    else
+      @product.update_columns(archived: true, archived_at: Time.current)
+    end
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to admin_products_path, notice: "Product #{@product.archived? ? 'archived' : 'unarchived'}" }
     end
   end
 
