@@ -18,15 +18,7 @@ class Category < ApplicationRecord
 
   has_many :products
   validates :name, presence: true
-  validate :prevent_circular_references
   scope :main_categories, -> { where(parent_id: nil) }
   scope :subcategories, -> { where.not(parent_id: nil) }
 
-  private
-
-  def prevent_circular_references
-    if parent_id == id
-      errors.add(:parent_id, "cannot be itself")
-    end
-  end
 end

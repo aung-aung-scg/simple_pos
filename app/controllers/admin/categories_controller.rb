@@ -36,7 +36,7 @@ class Admin::CategoriesController < ApplicationController
       redirect_to admin_categories_path, notice: 'Category was successfully created.'
     else
       load_parent_categories
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
