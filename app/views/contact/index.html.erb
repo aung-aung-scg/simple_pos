@@ -1,0 +1,65 @@
+<div class="container my-5">
+  <div class="row">
+    <!-- Contact Form -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Send Us a Message</h2>
+          
+          <%= form_with(url: contact_submit_path, local: true, class: "needs-validation", novalidate: true) do |form| %>
+            <div class="mb-3">
+              <%= form.label :name, "Your Name", class: "form-label" %>
+              <%= form.text_field :name, class: "form-control", required: true, value: @contact[:name] %>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :email, "Email Address", class: "form-label" %>
+              <%= form.email_field :email, class: "form-control", required: true, value: @contact[:email] %>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :message, "Message", class: "form-label" %>
+              <%= form.text_area :message, class: "form-control", rows: 4, required: true %>
+            </div>
+
+            <%= form.submit "Send Message", class: "btn btn-primary w-100" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title mb-4">Get In Touch</h2>
+
+          <div class="mb-4">
+            <h5><i class="bi bi-person-fill me-2"></i> Name</h5>
+            <p>Shun Lai Zaw</p>
+          </div>
+          
+          <div class="mb-4">
+            <h5><i class="bi bi-geo-alt-fill me-2"></i> Address</h5>
+            <p>575B, Paya Road, Yangon, Myanamr</p>
+          </div>
+
+          <div class="mb-4">
+            <h5><i class="bi bi-envelope-fill me-2"></i> Email</h5>
+            <p>shunlaizaw@cloverqueen.com</p>
+          </div>
+
+          <div class="mb-4">
+            <h5><i class="bi bi-telephone-fill me-2"></i> Phone</h5>
+            <p>+95 983777147</p>
+          </div>
+
+          <div class="mb-4">
+            <h5><i class="bi bi-clock-fill me-2"></i> Hours</h5>
+            <p>Monday - Friday: 9AM - 5PM</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

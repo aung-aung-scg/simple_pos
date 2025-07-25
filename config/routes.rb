@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get 'terms/index'
+  get 'privacy_policy/index'
+  get 'contact/index'
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
@@ -36,6 +39,10 @@ Rails.application.routes.draw do
   post 'cart/add/:variant_id', to: 'pos#add_to_cart', as: :add_item_to_cart
   post 'cart/remove/:variant_id', to: 'pos#remove_from_cart', as: :remove_item_from_cart
   post 'cart/update/:variant_id', to: 'pos#update_cart_item', as: :update_cart_item
+  get '/contact', to: 'contact#index', as: :contact
+  post '/contact/submit', to: 'contact#submit', as: :contact_submit
+  get '/privacy-policy', to: 'privacy_policy#index', as: :privacy_policy
+  get '/terms', to: 'terms#index', as: :terms
 
   # Admin namespace
   namespace :admin do

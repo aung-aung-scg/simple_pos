@@ -1,0 +1,24 @@
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h1 class="mb-4">Terms of Service</h1>
+          <p class="text-muted">Effective: <%= Date.today.strftime("%B %d, %Y") %></p>
+          
+          <div class="mt-4">
+            <h4>1. Acceptance of Terms</h4>
+            <p>By accessing this website, you agree to be bound by these Terms...</p>
+          </div>
+
+          <div class="mt-4">
+            <h4>2. User Responsibilities</h4>
+            <p>You agree not to misuse the service or attempt to compromise its security...</p>
+          </div>
+
+          <%= link_to "Back to Home", root_path, class: "btn btn-primary mt-4" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
