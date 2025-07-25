@@ -44,8 +44,8 @@ A modern admin dashboard for managing e-commerce operations, built with Ruby on 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/clover-queen-admin.git
-   cd clover-queen-admin
+   git clone https://github.com/yourusername/simple_pos.git
+   cd simple_pos
 
 2. Install dependencies:
     bundle install
