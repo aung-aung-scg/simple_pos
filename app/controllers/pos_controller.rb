@@ -3,7 +3,7 @@ class PosController < ApplicationController
 
   def index
     # Base query with eager loading
-    @products = Product.includes(:product_variants, :category)
+    @products = Product.includes(:product_variants, :category).where(archived: false)
 
     # Apply category filters
     if params[:category].present?
