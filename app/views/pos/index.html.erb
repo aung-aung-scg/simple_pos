@@ -180,7 +180,7 @@
     <!-- Pagination -->
     <% if @products.total_pages > 1 %>
       <div class="mt-5 d-flex justify-content-center">
-        <%= paginate @products, theme: 'bootstrap-5' %>
+        <%= paginate @products %>
       </div>
     <% end %>
   </div>
