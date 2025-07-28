@@ -33,7 +33,7 @@
     <%= form_with url: add_to_cart_pos_path, method: :post, local: true, id: "variant-selection-form" do %>
       <!-- Color Selection -->
       <div class="mb-4">
-        <label class="form-label fw-semibold text-uppercase">Color</label>
+        <label class="form-label fw-semibold ">COLOR: <span id="selected-color" class="text-dark"><%= @variants.first.color%></span></label>
         <div id="color-options" class="d-flex flex-wrap gap-2">
           <% @available_colors.each do |color| %>
             <% variant_with_image = @variants.find { |v| v.color == color && v.image.attached? } %>
@@ -150,6 +150,7 @@ function initializeVariantSelection() {
   // Initialize color selection
   $('.color-radio').off('change').on('change', function() {
     const color = $(this).val();
+    $('#selected-color').text(color);
     updateSizes(color, true);
     $('#color-error').hide();
   });
@@ -168,9 +169,10 @@ function initializeVariantSelection() {
     }
   });
 
-  // Auto-select first variant
+  // Auto-select first variant and update display
   if (variants.length > 0) {
     const firstColor = variants[0].color;
+    $('#selected-color').text(firstColor);
     $(`.color-radio[value="${firstColor}"]`).prop('checked', true).trigger('change');
   }
 }
