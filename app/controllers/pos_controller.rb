@@ -135,7 +135,7 @@ class PosController < ApplicationController
 
       # Clear cart after successful checkout
       session[:cart] = {}
-      redirect_to pos_path, notice: "Order ##{order.id} created successfully!"
+      redirect_to pos_path, notice: "Order created successfully!"
     end
   rescue => e
     redirect_to cart_pos_path, alert: "Checkout failed: #{e.message}"
