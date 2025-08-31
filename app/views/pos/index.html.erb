@@ -11,6 +11,7 @@
     <!-- Main Categories -->
     <div class="d-flex flex-wrap gap-3 mb-4">
       <% Category.main_categories.each do |main_cat| %>
+        <% next if main_cat.products.count.zero? %> <!-- Skip categories with zero products -->
         <%= link_to pos_path(category: main_cat.id), 
             class: "btn btn-green-primary rounded-pill px-4 #{'active' if params[:category].to_i == main_cat.id}", 
             data: { category_id: main_cat.id } do %>
@@ -26,6 +27,7 @@
         <h6 class="fw-semibold text-muted mb-3">Shop by Subcategory</h6>
         <div class="d-flex flex-wrap gap-2">
           <% @subcategories.each do |sub| %>
+            <% next if sub.products.count.zero? %> <!-- Skip subcategories with zero products -->
             <%= link_to pos_path(category: sub.id), 
                 class: "btn btn-green-secondary rounded-pill #{'active' if params[:category].to_i == sub.id}" do %>
               <%= sub.name %>
