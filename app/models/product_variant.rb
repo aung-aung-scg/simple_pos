@@ -22,7 +22,7 @@ class ProductVariant < ApplicationRecord
   belongs_to :product
   has_one_attached :image
 
-  validates :color, presence: true
+  # validates :color, presence: true
 
   def image_url
     return '' unless persisted? && image.attached?

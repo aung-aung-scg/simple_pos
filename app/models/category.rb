@@ -21,4 +21,11 @@ class Category < ApplicationRecord
   scope :main_categories, -> { where(parent_id: nil) }
   scope :subcategories, -> { where.not(parent_id: nil) }
 
+  def all_products
+    Product.where(category_id: [id] + subcategories.pluck(:id))
+  end
+
+  def deletable?
+    all_products.none?
+  end
 end

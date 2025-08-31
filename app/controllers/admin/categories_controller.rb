@@ -54,8 +54,12 @@ class Admin::CategoriesController < ApplicationController
   end
 
   def destroy
-    @category.destroy
-    redirect_to admin_categories_path, notice: 'Category was successfully deleted.'
+    if @category.products.exists?
+      redirect_to admin_categories_path, alert: 'Cannot delete a category with products.'
+    else
+      @category.destroy
+      redirect_to admin_categories_path, notice: 'Category was successfully deleted.'
+    end
   end
 
   private
