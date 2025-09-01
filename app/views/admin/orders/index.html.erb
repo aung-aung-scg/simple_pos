@@ -5,6 +5,46 @@
     </h1>
   </div>
 
+  <!-- 🔹 Filters -->
+  <div class="card mb-3 shadow-sm">
+    <div class="card-body">
+      <%= form_with url: admin_orders_path, method: :get, local: true, class: "row g-2 align-items-end" do |f| %>
+        <div class="col-auto">
+          <%= f.label :email, "Email", class: "form-label small" %>
+          <%= f.text_field :email,
+                value: params[:email],
+                placeholder: "Search by email",
+                class: "form-control form-control-sm" %>
+        </div>
+
+        <div class="col-auto">
+          <%= f.label :start_date, "Start Date", class: "form-label small" %>
+          <%= f.date_field :start_date,
+                value: params[:start_date],
+                class: "form-control form-control-sm" %>
+        </div>
+
+        <div class="col-auto">
+          <%= f.label :end_date, "End Date", class: "form-label small" %>
+          <%= f.date_field :end_date,
+                value: params[:end_date],
+                class: "form-control form-control-sm" %>
+        </div>
+
+        <div class="col-auto">
+          <%= f.submit "Filter", class: "btn btn-sm btn-primary" %>
+        </div>
+
+        <% if params[:email].present? || params[:start_date].present? || params[:end_date].present? %>
+          <div class="col-auto">
+            <%= link_to "Clear", admin_orders_path, class: "btn btn-sm btn-secondary" %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- 🔹 Orders Table -->
   <div class="card shadow-sm">
     <div class="card-body p-0">
       <div class="table-responsive">

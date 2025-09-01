@@ -6,8 +6,33 @@ class Admin::OrdersController < ApplicationController
 
   def index
     @orders = Order.includes(:user, order_items: { product: :product_variants })
-                 .order("#{sort_column} #{sort_direction}")
-                 .page(params[:page]).per(25)
+                  .references(:user)
+                  .order("orders.#{sort_column} #{sort_direction}")
+                  .page(params[:page])
+                  .per(25)
+
+    # Filter by email
+    if params[:email].present?
+      @orders = @orders.joins(:user)
+                      .where("LOWER(users.email) LIKE ?", "%#{params[:email].downcase}%")
+    end
+
+    # Filter by date range
+    if params[:start_date].present? && params[:end_date].present?
+      begin
+        start_date = Date.parse(params[:start_date])
+        end_date   = Date.parse(params[:end_date])
+        @orders = @orders.where(orders: { created_at: start_date.beginning_of_day..end_date.end_of_day })
+      rescue ArgumentError
+        # ignore invalid dates
+      end
+    elsif params[:start_date].present?
+      start_date = Date.parse(params[:start_date]) rescue nil
+      @orders = @orders.where("orders.created_at >= ?", start_date.beginning_of_day) if start_date
+    elsif params[:end_date].present?
+      end_date = Date.parse(params[:end_date]) rescue nil
+      @orders = @orders.where("orders.created_at <= ?", end_date.end_of_day) if end_date
+    end
   end
 
   def show
