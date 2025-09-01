@@ -35,6 +35,15 @@
       <%= link_to 'Add your first product', new_admin_product_path, class: 'btn btn-success mt-3' %>
     </div>
   <% end %>
+    <div class="mb-2 text-muted">
+      <% if @products.any? %>
+        <% start_index = @products.offset_value + 1 %>
+        <% end_index   = @products.offset_value + @products.length %>
+        Showing <%= start_index %> – <%= end_index %> of <%= @products.total_count %> products
+      <% else %>
+        No products found
+      <% end %>
+    </div>
    <% if @products.respond_to?(:total_pages) && @products.total_pages > 1 %>
     <div class="d-flex justify-content-center mt-4">
       <%= paginate @products %>

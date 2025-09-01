@@ -8,8 +8,6 @@ class Admin::OrdersController < ApplicationController
     @orders = Order.includes(:user, order_items: { product: :product_variants })
                   .references(:user)
                   .order("orders.#{sort_column} #{sort_direction}")
-                  .page(params[:page])
-                  .per(25)
 
     # Filter by email
     if params[:email].present?
@@ -33,6 +31,7 @@ class Admin::OrdersController < ApplicationController
       end_date = Date.parse(params[:end_date]) rescue nil
       @orders = @orders.where("orders.created_at <= ?", end_date.end_of_day) if end_date
     end
+    @orders = @orders.page(params[:page]).per(25)
   end
 
   def show

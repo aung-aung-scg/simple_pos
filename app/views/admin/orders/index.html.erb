@@ -138,6 +138,15 @@
       </div>
     </div>
   <% end %>
+   <div class="mb-2 text-muted">
+      <% if @orders.any? %>
+        <% start_index = @orders.offset_value + 1 %>
+        <% end_index   = @orders.offset_value + @orders.length %>
+        Showing <%= start_index %> – <%= end_index %> of <%= @orders.total_count %> orders
+      <% else %>
+        No orders found
+      <% end %>
+    </div>
 
   <% if @orders.respond_to?(:total_pages) && @orders.total_pages > 1 %>
     <div class="d-flex justify-content-center mt-4">
