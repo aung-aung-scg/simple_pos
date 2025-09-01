@@ -24,10 +24,14 @@
           <% end %>
           <span><%= item.product.name %></span>
         </td>
-        <td>
+      <td>
+        <% if item.product_variant.color.present? %>
           Color: <%= item.product_variant.color %><br>
+        <% end %>
+        <% if item.product_variant.size.present? %>
           Size: <%= item.product_variant.size %>
-        </td>
+        <% end %>
+      </td>
         <td class="text-center"><%= item.quantity %></td>
         <td class="text-end"><%= number_with_delimiter(item.product.price) %></td>
         <td class="text-end"><%= number_with_delimiter(item.product.price * item.quantity) %></td>
