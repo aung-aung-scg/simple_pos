@@ -67,6 +67,6 @@ A modern admin dashboard for managing e-commerce operations, built with Ruby on 
 
     Default admin login:
 
-        Email: admin@example.com
+        Email: admin@gmail.com
 
         Password: password

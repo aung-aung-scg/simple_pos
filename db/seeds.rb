@@ -1,5 +1,5 @@
 # === Admin/User Accounts ===
-User.find_or_create_by!(email: "admin@example.com") do |user|
+User.find_or_create_by!(email: "admin@gmail.com") do |user|
   user.password = "password"
   user.password_confirmation = "password"
   user.role = "admin"
@@ -9,7 +9,7 @@ User.find_or_create_by!(email: "admin@example.com") do |user|
   user.address = "575B Pyay Road, Yangon, Myanmar"
 end
 
-User.find_or_create_by!(email: "user@example.com") do |user|
+User.find_or_create_by!(email: "user@gmail.com") do |user|
   user.password = "password"
   user.password_confirmation = "password"
   user.role = "user"
