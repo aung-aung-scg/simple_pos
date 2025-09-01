@@ -87,7 +87,7 @@
                       <span class="badge bg-light text-dark border">
                         <%= item.quantity %> × <%= item.product.name %>
                         <% if item.product.product_variants.any? %>
-                          (<%= item.product.product_variants.first.color %>/<%= item.product.product_variants.first.size %>)
+                          (<%= item.product_variant.color %>/<%= item.product_variant.size %>)
                         <% end %>
                       </span>
                     <% end %>

@@ -15,6 +15,7 @@
     <thead class="table-dark">
       <tr>
         <th>Product</th>
+        <th>Colour/Size</th>
         <th>Quantity</th>
         <th>Price</th>
         <th>Subtotal</th>
@@ -24,6 +25,12 @@
       <% @order.order_items.includes(:product).each do |item| %>
         <tr>
           <td><%= item.product.name %></td>
+          <td>
+            <% if item.product.product_variants.any? %>
+              <%= item.product_variant.color %> / <%= item.product_variant.size %>
+            <% else %>
+              N/A
+            <% end %>
           <td><%= item.quantity %></td>
           <td><%= number_to_currency(item.product.price, unit: "MMK") %></td>
           <td><%= number_to_currency(item.product.price * item.quantity, unit: "MMK") %></td>
