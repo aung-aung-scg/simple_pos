@@ -44,7 +44,8 @@ class PosController < ApplicationController
 
   def cart
     @cart = session[:cart] || {}
-    @variants = ProductVariant.where(id: @cart.keys)
+    @variants = ProductVariant.where(id: @cart.keys).includes(:product)
+    @total = calculate_cart_total
   end
 
   def add_to_cart
@@ -52,14 +53,7 @@ class PosController < ApplicationController
     variant_id = params[:variant_id].to_s
     session[:cart][variant_id] ||= 0
     session[:cart][variant_id] += 1
-    redirect_to cart_pos_path, notice: "Added one item."
-  end
-
-  def remove_from_cart
-    session[:cart] ||= {}
-    variant_id = params[:variant_id].to_s
-    session[:cart].delete(variant_id)
-    redirect_to pos_cart_path, notice: "Item removed."
+    render_cart_json(variant_id)
   end
 
   def update_cart_item
@@ -68,12 +62,22 @@ class PosController < ApplicationController
     quantity = params[:quantity].to_i
     if quantity > 0
       session[:cart][variant_id] = quantity
-      flash[:notice] = "Quantity updated."
     else
       session[:cart].delete(variant_id)
-      flash[:notice] = "Item removed because quantity is zero."
     end
-    redirect_to pos_cart_path
+
+    variant = ProductVariant.find_by(id: variant_id)
+    subtotal = variant ? variant.product.price * (session[:cart][variant_id] || 0) : 0
+    total = calculate_cart_total
+    render json: { subtotal: subtotal, total: total }
+  end
+
+  def remove_from_cart
+    session[:cart] ||= {}
+    variant_id = params[:variant_id].to_s
+    session[:cart].delete(variant_id)
+    total = calculate_cart_total
+    render json: { total: total }
   end
 
   def prepare_checkout
@@ -195,10 +199,24 @@ class PosController < ApplicationController
 
   def calculate_cart_total
     total = 0
-    @cart.each do |variant_id, quantity|
-      variant = ProductVariant.find(variant_id)
+    (session[:cart] || {}).each do |variant_id, quantity|
+      variant = ProductVariant.find_by(id: variant_id)
+      next unless variant
       total += variant.product.price * quantity
     end
     total
+  end
+
+  def render_cart_json(variant_id)
+    variant = ProductVariant.find_by(id: variant_id)
+    subtotal = variant ? variant.product.price * (session[:cart][variant_id] || 0) : 0
+    total = calculate_cart_total
+
+    render json: {
+      variant_id: variant_id.to_i,
+      quantity: session[:cart][variant_id] || 0,
+      variant_subtotal: subtotal,
+      total: total
+    }
   end
 end
