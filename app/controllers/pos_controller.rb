@@ -53,7 +53,8 @@ class PosController < ApplicationController
     variant_id = params[:variant_id].to_s
     session[:cart][variant_id] ||= 0
     session[:cart][variant_id] += 1
-    render_cart_json(variant_id)
+    # render_cart_json(variant_id)
+    redirect_to cart_pos_path, notice: "Added one item."
   end
 
   def update_cart_item
