@@ -39,11 +39,16 @@ class Admin::OrdersController < ApplicationController
   end
 
   def destroy
-    if @order.destroy
-      redirect_to admin_orders_path, notice: "Order ##{@order.id} was successfully deleted."
+    if %w[completed shipped cancelled].include?(@order.status)
+      if @order.destroy
+        redirect_to admin_orders_path, notice: "Order ##{@order.id} was successfully deleted."
+      else
+        redirect_to admin_orders_path,
+                    alert: "Failed to delete order: #{@order.errors.full_messages.to_sentence}"
+      end
     else
       redirect_to admin_orders_path,
-                  alert: "Failed to delete order: #{@order.errors.full_messages.to_sentence}"
+                  alert: "Only completed, shipped, or cancelled orders can be deleted."
     end
   end
 
