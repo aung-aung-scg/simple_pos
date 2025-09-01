@@ -1,0 +1,38 @@
+<tr id="cart-row-<%= variant.id %>">
+  <td>
+    <% if variant.image.attached? %>
+      <%= image_tag variant.image.variant(resize_to_limit: [100,100]), class:"img-thumbnail", alt: variant.product.name %>
+    <% else %>
+      <div class="img-thumbnail d-flex align-items-center justify-content-center bg-light" style="width:100px;height:100px;">
+        <span class="text-muted small">No image</span>
+      </div>
+    <% end %>
+  </td>
+  <td>
+    <h5 class="mb-1"><%= variant.product.name %></h5>
+    <div class="text-muted">
+      <span class="me-2"><%= variant.color.titleize %></span>
+      <span><%= variant.size.upcase %></span>
+    </div>
+  </td>
+  <td class="fw-bold">MMK <%= number_with_delimiter(variant.product.price) %></td>
+  <td>
+    <input type="number" value="<%= session[:cart][variant.id.to_s] || 0 %>"
+           min="1" max="<%= variant.stock %>"
+           class="form-control quantity-input"
+           data-cart-target="qtyInput"
+           data-action="change->cart#updateQuantity"
+           data-cart-variant-id="<%= variant.id %>">
+  </td>
+  <td class="fw-bold subtotal" id="subtotal-<%= variant.id %>" data-cart-target="subtotal">
+    MMK <%= number_with_delimiter(variant.product.price * (session[:cart][variant.id.to_s] || 0)) %>
+  </td>
+  <td class="text-end">
+    <button class="btn btn-danger btn-sm remove-item"
+            data-cart-target="removeButton"
+            data-action="click->cart#removeItem"
+            data-cart-variant-id="<%= variant.id %>">
+      <i class="fas fa-trash-alt"></i>
+    </button>
+  </td>
+</tr>
