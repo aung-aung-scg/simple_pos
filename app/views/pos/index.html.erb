@@ -11,7 +11,6 @@
     <!-- Main Categories -->
     <div class="d-flex flex-wrap gap-3 mb-4">
       <% Category.main_categories.each do |main_cat| %>
-        <% next if main_cat.products.count.zero? %> <!-- Skip categories with zero products -->
         <%= link_to pos_path(category: main_cat.id), 
             class: "btn btn-green-primary rounded-pill px-4 #{'active' if params[:category].to_i == main_cat.id}", 
             data: { category_id: main_cat.id } do %>
