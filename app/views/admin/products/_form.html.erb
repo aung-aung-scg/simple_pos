@@ -91,7 +91,7 @@
             <div class="mb-3">
               <%= form.label :image, "Main Product Image", class: "form-label fw-bold d-block mb-2" %>
               <div class="file-upload-area border rounded p-3 text-center position-relative <%= 'border-danger' if @product.errors[:image].any? %>">
-                <% if @product.image.attached? %>
+                <% if  @product.persisted? && @product.image.attached? %>
                   <%= image_tag @product.image.variant(:thumb), class: "img-thumbnail mb-2" %>
                 <% end %>
                 <div class="image-preview-container"></div>
