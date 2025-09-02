@@ -24,6 +24,15 @@
 
   <!-- Product Options -->
   <div class="col-lg-6">
+    <% if @product.description.present? %>
+      <div class="mb-4">
+        <span class="fs-6 text-muted text-uppercase">Description</span>
+        <p id="product-description" class="description collapsed text-secondary mb-0">
+          <%= @product.description %>
+        </p>
+      </div>
+    <% end %>
+
     <!-- Price -->
     <div class="mb-4">
       <span class="fs-6 text-muted text-uppercase">Price</span>
@@ -170,6 +179,36 @@ if (document.readyState === 'complete') initializeVariantSelection();
 
 <!-- CSS -->
 <style>
+.description {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  transition: max-height 0.3s ease;
+}
+
+/* collapsed = show limited lines */
+.description.collapsed {
+  -webkit-line-clamp: 3; /* adjust lines as needed */
+  max-height: 4.5em;
+}
+
+/* expanded = show full text */
+.description.expanded {
+  -webkit-line-clamp: unset;
+  max-height: none;
+}
+
+/* adjust for larger screens */
+@media (min-width: 768px) {
+  .description.collapsed {
+    -webkit-line-clamp: 5;
+    max-height: 7.5em;
+  }
+}
+
+/* Variant selection CSS (existing) */
 .grid-template-columns {
   display: grid;
   gap: 0.5rem;
