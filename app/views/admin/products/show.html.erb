@@ -119,8 +119,8 @@
                           </span>
                         </div>
                         <div class="mb-1"><strong>Size:</strong> <%= variant.size %></div>
-                        <div class="<%= variant.stock > 10 ? 'text-success' : 'text-danger' %>">
-                          <small><strong>Stock:</strong> <%= variant.stock %></small>
+                       <div class="<%= (variant.stock || 0) > 10 ? 'text-success' : 'text-danger' %>">
+                          <small><strong>Stock:</strong> <%= variant.stock || 0 %></small>
                         </div>
                       </div>
                     </div>
